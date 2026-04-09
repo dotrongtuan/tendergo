@@ -69,6 +69,14 @@ function takeLessonBalancedQuestions(questions: Question[], count: number) {
 }
 
 function pickQuestions(exam: ExamDefinition, questionPool: Question[], questionCount: number) {
+  if (exam.presetQuestionIds?.length) {
+    const questionMap = new Map(questionPool.map((question) => [question.id, question]));
+    return exam.presetQuestionIds
+      .map((questionId) => questionMap.get(questionId))
+      .filter((question): question is Question => Boolean(question))
+      .slice(0, questionCount);
+  }
+
   const scopedQuestions = questionPool.filter((question) => exam.topicIds.includes(question.topicId));
   const limit = Math.min(questionCount, scopedQuestions.length);
 

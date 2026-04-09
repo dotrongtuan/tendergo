@@ -13,6 +13,7 @@ export type RootStackParamList = {
   AuthGateway: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   TopicDetail: { topicId: string };
+  TopicSources: { topicId: string };
   LessonReader: { lessonId: string };
   QuestionFilter: undefined;
   TopicExamSetup: { topicId: string };

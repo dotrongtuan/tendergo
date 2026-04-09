@@ -3,8 +3,8 @@ import type { QuestionBankFilters } from '../types/models';
 export const APP_NAME = 'TenderGO';
 export const PROGRAM_CODE = 'CTBD-DAUTHAU';
 export const APP_DISCLAIMER =
-  'Du lieu ly thuyet va cau hoi trong ban demo chi la du lieu mau minh hoa, can duoc hoi dong chuyen mon ra soat truoc khi dua vao su dung chinh thuc.';
-export const MOCK_SOURCE_LABEL = 'TenderGO mock seed v1';
+  'Dữ liệu lý thuyết và câu hỏi trong ứng dụng được tích hợp từ tài liệu chuyên đề do người dùng cung cấp. Khi đưa vào sử dụng chính thức, cần tiếp tục đối chiếu văn bản pháp luật hiện hành và được hội đồng chuyên môn rà soát.';
+export const MOCK_SOURCE_LABEL = 'TenderGO fallback generated seed';
 export const SNAPSHOT_VERSION = '1.0.0';
 
 export const OPTION_IDS = ['A', 'B', 'C', 'D'] as const;

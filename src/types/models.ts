@@ -3,7 +3,7 @@ export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
 export type QuestionStatusFilter = 'all' | 'unanswered' | 'incorrect' | 'bookmarked';
 export type ExamCatalogMode = 'topic' | 'comprehensive';
 export type ExamExperienceMode = 'practice' | 'simulation';
-export type QuestionSelectionStrategy = 'random' | 'topic-balanced' | 'lesson-balanced';
+export type QuestionSelectionStrategy = 'random' | 'topic-balanced' | 'lesson-balanced' | 'preset';
 export type OptionId = 'A' | 'B' | 'C' | 'D';
 export type AuthMode = 'guest' | 'mock' | null;
 
@@ -13,6 +13,13 @@ export interface Program {
   name: string;
   description: string;
   disclaimer: string;
+}
+
+export interface TopicSourceDocument {
+  fileName: string;
+  documentTitle: string;
+  legalReferences: string[];
+  importedNote?: string;
 }
 
 export interface Topic {
@@ -27,6 +34,7 @@ export interface Topic {
   tags: string[];
   order: number;
   estimatedStudyTime: number;
+  sourceDocument?: TopicSourceDocument;
 }
 
 export interface Lesson {
@@ -75,6 +83,9 @@ export interface ExamDefinition {
   questionSelectionStrategy: QuestionSelectionStrategy;
   passingScore: number;
   description: string;
+  presetQuestionIds?: string[];
+  sourceLabel?: string;
+  sourceFile?: string;
 }
 
 export interface TopicBreakdown {

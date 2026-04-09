@@ -15,6 +15,7 @@ import { QuestionFilterScreen } from '../features/questions/QuestionFilterScreen
 import { SearchScreen } from '../features/search/SearchScreen';
 import { LessonReaderScreen } from '../features/topics/LessonReaderScreen';
 import { TopicDetailScreen } from '../features/topics/TopicDetailScreen';
+import { TopicSourcesScreen } from '../features/topics/TopicSourcesScreen';
 import { useAppStore } from '../store/useAppStore';
 import { useNavigationTheme } from '../theme';
 import { MainTabs } from './MainTabs';
@@ -38,6 +39,7 @@ export function AppNavigator() {
           <>
             <Stack.Screen name="MainTabs" component={MainTabs} />
             <Stack.Screen name="TopicDetail" component={TopicDetailScreen} />
+            <Stack.Screen name="TopicSources" component={TopicSourcesScreen} />
             <Stack.Screen name="LessonReader" component={LessonReaderScreen} />
             <Stack.Screen name="QuestionFilter" component={QuestionFilterScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="TopicExamSetup" component={TopicExamSetupScreen} />

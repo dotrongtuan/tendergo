@@ -89,6 +89,22 @@ export function TopicDetailScreen({ navigation, route }: Props) {
           </Text>
         ))}
       </Card>
+      {topic.sourceDocument ? (
+        <Card>
+          <SectionHeader title="Nguồn tài liệu" subtitle={topic.sourceDocument.fileName} />
+          <Text style={[styles.sourceTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
+            {topic.sourceDocument.documentTitle}
+          </Text>
+          <Text style={[styles.body, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
+            Dữ liệu chuyên đề đã được nhập trực tiếp từ tài liệu nguồn. Bạn có thể mở màn hình nguồn để xem căn cứ tham chiếu và ghi chú import.
+          </Text>
+          <Button
+            label="Xem nguồn và căn cứ"
+            onPress={() => navigation.navigate('TopicSources', { topicId })}
+            variant="secondary"
+          />
+        </Card>
+      ) : null}
       <View style={[styles.actions, isTablet && styles.actionsTablet]}>
         <Button label="Thi thử chuyên đề" onPress={() => navigation.navigate('TopicExamSetup', { topicId })} />
         <Button
@@ -106,6 +122,7 @@ export function TopicDetailScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   body: { fontSize: 14, lineHeight: 22 },
+  sourceTitle: { fontSize: 15, lineHeight: 22 },
   lessonList: { gap: 12 },
   lessonCard: { padding: 14 },
   lessonHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 },

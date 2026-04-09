@@ -1,0 +1,598 @@
+{
+  "generatedFrom": "D:\\Data\\TUANDT\\ĐẤU THẦU",
+  "examCount": 2,
+  "exams": [
+    {
+      "id": "general-source-01",
+      "sourceFile": "bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx",
+      "title": "BÀI THI THỬ TRẮC NGHIỆM CÁC KIẾN THỨC CHUNG VỀ ĐẤU THẦU",
+      "description": "Bộ đề được nhập từ file bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx để mô phỏng đề thi sát tài liệu nguồn.",
+      "durationMinutes": 30,
+      "scoringGuide": [
+        "18–20 câu đúng: Nắm tốt kiến thức chung về đấu thầu.",
+        "15–17 câu đúng: Đạt mức khá, cần rà soát các điểm dễ nhầm.",
+        "12–14 câu đúng: Cần ôn lại nhóm quy định chung và hệ thống văn bản.",
+        "Dưới 12 câu đúng: Nên học lại chuyên đề nền tảng trước khi làm đề tiếp theo.",
+        "Ghi chú pháp lý sử dụng để biên soạn: Luật Đấu thầu 2023; các luật sửa đổi, bổ sung năm 2025; cùng các văn bản hướng dẫn hiện hành về lựa chọn nhà thầu, đăng tải thông tin trên Hệ thống và thi/chứng chỉ nghiệp vụ chuyên môn về đấu thầu."
+      ],
+      "questions": [
+        {
+          "number": 1,
+          "question": "Văn bản luật nền tảng hiện hành điều chỉnh hoạt động đấu thầu là:",
+          "options": {
+            "A": "Luật Đầu tư công",
+            "B": "Luật Đấu thầu 2023",
+            "C": "Luật Doanh nghiệp",
+            "D": "Luật Xây dựng"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Luật Đấu thầu 2023 Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 2,
+          "question": "Một trong những mục tiêu cốt lõi của pháp luật đấu thầu là bảo đảm:",
+          "options": {
+            "A": "Tăng số lượng nhà thầu bằng mọi cách",
+            "B": "Cạnh tranh, công bằng, minh bạch và hiệu quả kinh tế",
+            "C": "Chỉ ưu tiên nhà thầu trong nước",
+            "D": "Chỉ ưu tiên giá thấp nhất"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Cạnh tranh, công bằng, minh bạch và hiệu quả kinh tế Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 3,
+          "question": "Chủ thể nào dưới đây có thể thuộc đối tượng tham gia hoạt động lựa chọn nhà thầu?",
+          "options": {
+            "A": "Chủ đầu tư",
+            "B": "Bên mời thầu",
+            "C": "Nhà thầu",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 4,
+          "question": "Tư cách hợp lệ của nhà thầu được hiểu là:",
+          "options": {
+            "A": "Chỉ cần có báo giá thấp nhất",
+            "B": "Chỉ cần có kinh nghiệm nhiều năm",
+            "C": "Phải đáp ứng các điều kiện pháp lý tối thiểu theo quy định để tham dự thầu hợp lệ",
+            "D": "Chỉ cần có quan hệ hợp tác với chủ đầu tư"
+          },
+          "correctAnswer": "C",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là C. Phải đáp ứng các điều kiện pháp lý tối thiểu theo quy định để tham dự thầu hợp lệ Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 5,
+          "question": "Nội dung nào dưới đây gắn trực tiếp với yêu cầu bảo đảm cạnh tranh trong đấu thầu?",
+          "options": {
+            "A": "Nhà thầu và bên mời thầu có quan hệ phụ thuộc làm mất tính độc lập",
+            "B": "Nhà thầu nộp hồ sơ đúng hạn",
+            "C": "Nhà thầu có bảo lãnh dự thầu",
+            "D": "Nhà thầu có tài khoản ngân hàng"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Nhà thầu và bên mời thầu có quan hệ phụ thuộc làm mất tính độc lập Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 6,
+          "question": "Khi xem xét một tình huống đấu thầu, dấu hiệu nào sau đây cần nghĩ ngay đến nguy cơ vi phạm bảo đảm cạnh tranh?",
+          "options": {
+            "A": "Hồ sơ được nộp qua Hệ thống",
+            "B": "Các bên có quan hệ sở hữu, quản lý hoặc phụ thuộc tài chính bất thường",
+            "C": "Nhà thầu nộp hồ sơ sớm",
+            "D": "Có nhiều nhà thầu mua hồ sơ"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Các bên có quan hệ sở hữu, quản lý hoặc phụ thuộc tài chính bất thường Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 7,
+          "question": "Việc cung cấp, đăng tải thông tin về đấu thầu hiện nay gắn chặt với:",
+          "options": {
+            "A": "Trang web riêng của từng doanh nghiệp",
+            "B": "Hệ thống mạng nội bộ của bên mời thầu",
+            "C": "Hệ thống mạng đấu thầu quốc gia",
+            "D": "Mạng xã hội của chủ đầu tư"
+          },
+          "correctAnswer": "C",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là C. Hệ thống mạng đấu thầu quốc gia Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 8,
+          "question": "Chủ thể có trách nhiệm đăng tải thông tin trong đấu thầu phải bảo đảm yếu tố nào sau đây?",
+          "options": {
+            "A": "Đúng chủ thể, đúng thời điểm, đúng nội dung theo quy định",
+            "B": "Chỉ cần đăng khi có tranh chấp",
+            "C": "Chỉ đăng khi có yêu cầu của nhà thầu",
+            "D": "Có thể đăng thiếu nếu gói thầu nhỏ"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Đúng chủ thể, đúng thời điểm, đúng nội dung theo quy định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 9,
+          "question": "Ưu đãi trong lựa chọn nhà thầu được hiểu đúng nhất là:",
+          "options": {
+            "A": "Muốn áp dụng khi nào cũng được",
+            "B": "Là cơ chế ưu tiên được áp dụng theo đúng điều kiện, đối tượng và cách thức luật định",
+            "C": "Chỉ dành cho mọi doanh nghiệp nhà nước",
+            "D": "Chỉ áp dụng khi có một nhà thầu dự thầu"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Là cơ chế ưu tiên được áp dụng theo đúng điều kiện, đối tượng và cách thức luật định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 10,
+          "question": "Nội dung nào sau đây thuộc nhóm chi phí trong đấu thầu?",
+          "options": {
+            "A": "Chi phí tổ chức lựa chọn nhà thầu",
+            "B": "Chi phí đăng tải/cung cấp thông tin theo quy định",
+            "C": "Chi phí liên quan đến Hệ thống theo quy định áp dụng",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 11,
+          "question": "Hành vi nào sau đây thuộc nhóm hành vi bị cấm trong đấu thầu?",
+          "options": {
+            "A": "Thông thầu",
+            "B": "Gian lận",
+            "C": "Cản trở hoạt động đấu thầu",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 12,
+          "question": "Nếu có hành vi vi phạm pháp luật về đấu thầu, tùy tính chất và mức độ có thể bị:",
+          "options": {
+            "A": "Xử lý kỷ luật, xử phạt vi phạm hành chính, cấm tham gia hoạt động đấu thầu",
+            "B": "Chỉ nhắc nhở nội bộ",
+            "C": "Chỉ bồi thường dân sự",
+            "D": "Không bị xử lý nếu gói thầu đã hoàn thành"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Xử lý kỷ luật, xử phạt vi phạm hành chính, cấm tham gia hoạt động đấu thầu Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 13,
+          "question": "Trong hoạt động lựa chọn nhà thầu, trách nhiệm của các bên phải được hiểu theo hướng:",
+          "options": {
+            "A": "Không cần phân định rõ",
+            "B": "Chủ thể nào làm việc gì thì chịu trách nhiệm về phần việc đó theo quy định",
+            "C": "Chỉ người phê duyệt cuối cùng chịu trách nhiệm",
+            "D": "Chỉ nhà thầu chịu trách nhiệm"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Chủ thể nào làm việc gì thì chịu trách nhiệm về phần việc đó theo quy định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 14,
+          "question": "Tổ chuyên gia trong lựa chọn nhà thầu thường gắn với công việc nào sau đây?",
+          "options": {
+            "A": "Đánh giá hồ sơ theo nhiệm vụ được giao",
+            "B": "Tự ý phê duyệt kết quả lựa chọn nhà thầu",
+            "C": "Ký hợp đồng thay chủ đầu tư",
+            "D": "Miễn toàn bộ trách nhiệm pháp lý"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Đánh giá hồ sơ theo nhiệm vụ được giao Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 15,
+          "question": "Một nhà thầu đang bị cấm tham gia hoạt động đấu thầu thì:",
+          "options": {
+            "A": "Vẫn có tư cách hợp lệ nếu giá thấp",
+            "B": "Không đáp ứng điều kiện về tư cách hợp lệ",
+            "C": "Được tham dự nếu có thư giới thiệu",
+            "D": "Chỉ bị hạn chế với gói thầu xây lắp"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Không đáp ứng điều kiện về tư cách hợp lệ Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 16,
+          "question": "Một trong những lỗi ôn thi thường gặp là nhầm lẫn giữa:",
+          "options": {
+            "A": "Lựa chọn nhà thầu và lựa chọn nhà đầu tư",
+            "B": "Chủ đầu tư và kế toán trưởng",
+            "C": "Hợp đồng và phụ lục hợp đồng",
+            "D": "Biên bản và báo cáo tài chính"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Lựa chọn nhà thầu và lựa chọn nhà đầu tư Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 17,
+          "question": "Văn bản hướng dẫn hiện hành về cung cấp, đăng tải thông tin về đấu thầu và mẫu hồ sơ đấu thầu trên Hệ thống là:",
+          "options": {
+            "A": "Thông tư 79/2025/TT-BTC",
+            "B": "Luật Doanh nghiệp",
+            "C": "Bộ luật Lao động",
+            "D": "Nghị định về xử phạt điện lực"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Thông tư 79/2025/TT-BTC Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 18,
+          "question": "Văn bản quy định chi tiết một số điều và biện pháp thi hành Luật Đấu thầu về lựa chọn nhà thầu hiện hành là:",
+          "options": {
+            "A": "Nghị định 24/2024/NĐ-CP",
+            "B": "Nghị định 214/2025/NĐ-CP",
+            "C": "Cả A và B đều không liên quan",
+            "D": "Chỉ Luật Đấu thầu, không cần nghị định"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Nghị định 214/2025/NĐ-CP Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 19,
+          "question": "Quy định về thi, cấp, thu hồi chứng chỉ nghiệp vụ chuyên môn về đấu thầu hiện được đặt chủ yếu tại:",
+          "options": {
+            "A": "Thông tư 02/2024/TT-BKHĐT và văn bản sửa đổi, bổ sung",
+            "B": "Luật Nhà ở",
+            "C": "Luật Viễn thông",
+            "D": "Luật Giáo dục đại học"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là A. Thông tư 02/2024/TT-BKHĐT và văn bản sửa đổi, bổ sung Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        },
+        {
+          "number": 20,
+          "question": "Phương pháp làm bài phù hợp nhất với câu hỏi tình huống về đấu thầu là:",
+          "options": {
+            "A": "Chọn ngay đáp án dài nhất",
+            "B": "Xác định chủ thể, hành vi/sự kiện, đối chiếu điều kiện luật định rồi kết luận",
+            "C": "Chọn đáp án có nhiều thuật ngữ kỹ thuật nhất",
+            "D": "Suy đoán theo kinh nghiệm cá nhân, không cần bám luật"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx là B. Xác định chủ thể, hành vi/sự kiện, đối chiếu điều kiện luật định rồi kết luận Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx do người dùng cung cấp"
+        }
+      ]
+    },
+    {
+      "id": "general-source-02",
+      "sourceFile": "Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx",
+      "title": "BÀI THI THỬ TRẮC NGHIỆM KIẾN THỨC CHUNG VỀ ĐẤU THẦU",
+      "description": "Bài thi thử trắc nghiệm kiến thức chung về đấu thầu do tôi biên soạn theo khung pháp lý hiện hành đang áp dụng, trọng tâm là Luật Đấu thầu 2023, các sửa đổi tại Luật 57/2024/QH15 và Luật 90/2025/QH15, cùng các văn bản hướng dẫn quan trọng như Nghị định 214/2025/NĐ-CP, Nghị định 17/2025/NĐ-CP, Thông tư 79/2025/TT-BTC và quy định về thi/chứng chỉ tại Thông tư 02/2024/TT-BKHĐT, sửa đổi bởi Thông tư 105/2025/TT-BTC.",
+      "durationMinutes": 30,
+      "scoringGuide": [
+        "18–20 câu đúng: Nắm tốt kiến thức chung",
+        "15–17 câu đúng: Đạt mức khá, cần rà soát các điểm dễ nhầm",
+        "12–14 câu đúng: Cần ôn lại nhóm quy định chung và hệ thống văn bản",
+        "Dưới 12 câu đúng: Nên học lại theo chuyên đề nền tảng trước khi làm đề tiếp theo",
+        "Tôi có thể làm tiếp ngay Đề thi thử số 2 khó hơn, hoặc xuất bộ đề này thành file .docx để tải xuống."
+      ],
+      "questions": [
+        {
+          "number": 1,
+          "question": "Văn bản luật nền tảng hiện hành điều chỉnh hoạt động đấu thầu là:",
+          "options": {
+            "A": "Luật Đầu tư công",
+            "B": "Luật Đấu thầu 2023",
+            "C": "Luật Doanh nghiệp",
+            "D": "Luật Xây dựng"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Luật Đấu thầu 2023 Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 2,
+          "question": "Một trong những mục tiêu cốt lõi của pháp luật đấu thầu là bảo đảm:",
+          "options": {
+            "A": "Tăng số lượng nhà thầu bằng mọi cách",
+            "B": "Cạnh tranh, công bằng, minh bạch và hiệu quả kinh tế",
+            "C": "Chỉ ưu tiên nhà thầu trong nước",
+            "D": "Chỉ ưu tiên giá thấp nhất"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Cạnh tranh, công bằng, minh bạch và hiệu quả kinh tế Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 3,
+          "question": "Chủ thể nào dưới đây có thể thuộc đối tượng tham gia hoạt động lựa chọn nhà thầu?",
+          "options": {
+            "A": "Chủ đầu tư",
+            "B": "Bên mời thầu",
+            "C": "Nhà thầu",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 4,
+          "question": "Tư cách hợp lệ của nhà thầu được hiểu là:",
+          "options": {
+            "A": "Chỉ cần có báo giá thấp nhất",
+            "B": "Chỉ cần có kinh nghiệm nhiều năm",
+            "C": "Phải đáp ứng các điều kiện pháp lý tối thiểu theo quy định để tham dự thầu hợp lệ",
+            "D": "Chỉ cần có quan hệ hợp tác với chủ đầu tư"
+          },
+          "correctAnswer": "C",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là C. Phải đáp ứng các điều kiện pháp lý tối thiểu theo quy định để tham dự thầu hợp lệ Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 5,
+          "question": "Nội dung nào dưới đây gắn trực tiếp với yêu cầu bảo đảm cạnh tranh trong đấu thầu?",
+          "options": {
+            "A": "Nhà thầu và bên mời thầu có quan hệ phụ thuộc làm mất tính độc lập",
+            "B": "Nhà thầu nộp hồ sơ đúng hạn",
+            "C": "Nhà thầu có bảo lãnh dự thầu",
+            "D": "Nhà thầu có tài khoản ngân hàng"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Nhà thầu và bên mời thầu có quan hệ phụ thuộc làm mất tính độc lập Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 6,
+          "question": "Khi xem xét một tình huống đấu thầu, dấu hiệu nào sau đây cần nghĩ ngay đến nguy cơ vi phạm bảo đảm cạnh tranh?",
+          "options": {
+            "A": "Hồ sơ được nộp qua Hệ thống",
+            "B": "Các bên có quan hệ sở hữu, quản lý hoặc phụ thuộc tài chính bất thường",
+            "C": "Nhà thầu nộp hồ sơ sớm",
+            "D": "Có nhiều nhà thầu mua hồ sơ"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Các bên có quan hệ sở hữu, quản lý hoặc phụ thuộc tài chính bất thường Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "easy",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 7,
+          "question": "Việc cung cấp, đăng tải thông tin về đấu thầu hiện nay gắn chặt với:",
+          "options": {
+            "A": "Trang web riêng của từng doanh nghiệp",
+            "B": "Hệ thống mạng nội bộ của bên mời thầu",
+            "C": "Hệ thống mạng đấu thầu quốc gia",
+            "D": "Mạng xã hội của chủ đầu tư"
+          },
+          "correctAnswer": "C",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là C. Hệ thống mạng đấu thầu quốc gia Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 8,
+          "question": "Chủ thể có trách nhiệm đăng tải thông tin trong đấu thầu phải bảo đảm yếu tố nào sau đây?",
+          "options": {
+            "A": "Đúng chủ thể, đúng thời điểm, đúng nội dung theo quy định",
+            "B": "Chỉ cần đăng khi có tranh chấp",
+            "C": "Chỉ đăng khi có yêu cầu của nhà thầu",
+            "D": "Có thể đăng thiếu nếu gói thầu nhỏ"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Đúng chủ thể, đúng thời điểm, đúng nội dung theo quy định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 9,
+          "question": "Ưu đãi trong lựa chọn nhà thầu được hiểu đúng nhất là:",
+          "options": {
+            "A": "Muốn áp dụng khi nào cũng được",
+            "B": "Là cơ chế ưu tiên được áp dụng theo đúng điều kiện, đối tượng và cách thức luật định",
+            "C": "Chỉ dành cho mọi doanh nghiệp nhà nước",
+            "D": "Chỉ áp dụng khi có một nhà thầu dự thầu"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Là cơ chế ưu tiên được áp dụng theo đúng điều kiện, đối tượng và cách thức luật định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 10,
+          "question": "Nội dung nào sau đây thuộc nhóm chi phí trong đấu thầu?",
+          "options": {
+            "A": "Chi phí tổ chức lựa chọn nhà thầu",
+            "B": "Chi phí đăng tải/cung cấp thông tin theo quy định",
+            "C": "Chi phí liên quan đến Hệ thống theo quy định áp dụng",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 11,
+          "question": "Hành vi nào sau đây thuộc nhóm hành vi bị cấm trong đấu thầu?",
+          "options": {
+            "A": "Thông thầu",
+            "B": "Gian lận",
+            "C": "Cản trở hoạt động đấu thầu",
+            "D": "Cả A, B và C"
+          },
+          "correctAnswer": "D",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là D. Cả A, B và C Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 12,
+          "question": "Nếu có hành vi vi phạm pháp luật về đấu thầu, tùy tính chất và mức độ có thể bị:",
+          "options": {
+            "A": "Xử lý kỷ luật, xử phạt vi phạm hành chính, cấm tham gia hoạt động đấu thầu",
+            "B": "Chỉ nhắc nhở nội bộ",
+            "C": "Chỉ bồi thường dân sự",
+            "D": "Không bị xử lý nếu gói thầu đã hoàn thành"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Xử lý kỷ luật, xử phạt vi phạm hành chính, cấm tham gia hoạt động đấu thầu Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 13,
+          "question": "Trong hoạt động lựa chọn nhà thầu, trách nhiệm của các bên phải được hiểu theo hướng:",
+          "options": {
+            "A": "Không cần phân định rõ",
+            "B": "Chủ thể nào làm việc gì thì chịu trách nhiệm về phần việc đó theo quy định",
+            "C": "Chỉ người phê duyệt cuối cùng chịu trách nhiệm",
+            "D": "Chỉ nhà thầu chịu trách nhiệm"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Chủ thể nào làm việc gì thì chịu trách nhiệm về phần việc đó theo quy định Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "medium",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 14,
+          "question": "Tổ chuyên gia trong lựa chọn nhà thầu thường gắn với công việc nào sau đây?",
+          "options": {
+            "A": "Đánh giá hồ sơ theo nhiệm vụ được giao",
+            "B": "Tự ý phê duyệt kết quả lựa chọn nhà thầu",
+            "C": "Ký hợp đồng thay chủ đầu tư",
+            "D": "Miễn toàn bộ trách nhiệm pháp lý"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Đánh giá hồ sơ theo nhiệm vụ được giao Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 15,
+          "question": "Một nhà thầu đang bị cấm tham gia hoạt động đấu thầu thì:",
+          "options": {
+            "A": "Vẫn có tư cách hợp lệ nếu giá thấp",
+            "B": "Không đáp ứng điều kiện về tư cách hợp lệ",
+            "C": "Được tham dự nếu có thư giới thiệu",
+            "D": "Chỉ bị hạn chế với gói thầu xây lắp"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Không đáp ứng điều kiện về tư cách hợp lệ Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 16,
+          "question": "Một trong những lỗi ôn thi thường gặp là nhầm lẫn giữa:",
+          "options": {
+            "A": "Lựa chọn nhà thầu và lựa chọn nhà đầu tư",
+            "B": "Chủ đầu tư và kế toán trưởng",
+            "C": "Hợp đồng và phụ lục hợp đồng",
+            "D": "Biên bản và báo cáo tài chính"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Lựa chọn nhà thầu và lựa chọn nhà đầu tư Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 17,
+          "question": "Văn bản hướng dẫn hiện hành về cung cấp, đăng tải thông tin về đấu thầu và mẫu hồ sơ đấu thầu trên Hệ thống là:",
+          "options": {
+            "A": "Thông tư 79/2025/TT-BTC",
+            "B": "Luật Doanh nghiệp",
+            "C": "Bộ luật Lao động",
+            "D": "Nghị định về xử phạt điện lực"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Thông tư 79/2025/TT-BTC Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 18,
+          "question": "Văn bản quy định chi tiết một số điều và biện pháp thi hành Luật Đấu thầu về lựa chọn nhà thầu hiện hành là:",
+          "options": {
+            "A": "Nghị định 24/2024/NĐ-CP",
+            "B": "Nghị định 214/2025/NĐ-CP",
+            "C": "Cả A và B đều không liên quan",
+            "D": "Chỉ Luật Đấu thầu, không cần nghị định"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Nghị định 214/2025/NĐ-CP Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 19,
+          "question": "Quy định về thi, cấp, thu hồi chứng chỉ nghiệp vụ chuyên môn về đấu thầu hiện được đặt chủ yếu tại:",
+          "options": {
+            "A": "Thông tư 02/2024/TT-BKHĐT và văn bản sửa đổi, bổ sung",
+            "B": "Luật Nhà ở",
+            "C": "Luật Viễn thông",
+            "D": "Luật Giáo dục đại học"
+          },
+          "correctAnswer": "A",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là A. Thông tư 02/2024/TT-BKHĐT và văn bản sửa đổi, bổ sung Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        },
+        {
+          "number": 20,
+          "question": "Phương pháp làm bài phù hợp nhất với câu hỏi tình huống về đấu thầu là:",
+          "options": {
+            "A": "Chọn ngay đáp án dài nhất",
+            "B": "Xác định chủ thể, hành vi/sự kiện, đối chiếu điều kiện luật định rồi kết luận",
+            "C": "Chọn đáp án có nhiều thuật ngữ kỹ thuật nhất",
+            "D": "Suy đoán theo kinh nghiệm cá nhân, không cần bám luật"
+          },
+          "correctAnswer": "B",
+          "explanation": "Đáp án đúng theo đề nguồn Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx là B. Xác định chủ thể, hành vi/sự kiện, đối chiếu điều kiện luật định rồi kết luận Cần tiếp tục đối chiếu văn bản hiện hành khi sử dụng chính thức.",
+          "difficulty": "hard",
+          "source": "Tài liệu đề thi Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx do người dùng cung cấp"
+        }
+      ]
+    }
+  ]
+}
