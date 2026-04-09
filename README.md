@@ -1,226 +1,107 @@
 # TenderGO
 
-Ung dung hoc tap va on thi da nen tang cho chuong trinh boi duong on thi chung chi nghiep vu chuyen mon ve dau thau.
+[![CI](https://github.com/dotrongtuan/tendergo/actions/workflows/ci.yml/badge.svg)](https://github.com/dotrongtuan/tendergo/actions/workflows/ci.yml)
 
-## 1. Tong quan
+TenderGO is a cross-platform learning and exam preparation app for the procurement professional certification training program.
 
-TenderGO duoc xay dung theo huong:
+The current version is an offline-first MVP built with Expo + React Native + TypeScript, designed to be easy to extend into a production e-learning platform with a real backend, admin tooling, and cloud sync.
 
-- E-learning mini platform
-- Test preparation app
-- Offline-first MVP
-- Admin-ready data model
-- Co the mo rong len backend/API thuc trong cac giai doan tiep theo
+Important note: the included lessons and questions are sample demo content only. They must be reviewed by subject matter experts before any official use.
 
-Phien ban hien tai tap trung vao:
+## Release Status
 
-- Hoc theo tung chuyen de
-- Doc bai hoc ly thuyet co cau truc
-- Luyen ngan hang cau hoi
-- Thi thu theo chuyen de
-- Thi thu tong hop
-- Luu lich su lam bai, bookmark, tien do hoc
-- Phan tich diem manh, diem yeu
-- Import/export snapshot JSON
+- Current release: `1.0.0`
+- Release notes: [CHANGELOG.md](./CHANGELOG.md)
+- Default remote branch: `main`
+- Verified locally:
+  - `npm run typecheck`
+  - `npm run build:web`
 
-Du lieu hien tai la du lieu mau minh hoa. Can duoc hoi dong chuyen mon ra soat truoc khi dua vao su dung chinh thuc.
+## Highlights
 
-## 2. Actor va use case
+- Structured topic-based learning flow
+- Lesson reader with key points, quick notes, and flash summary
+- Question bank with filters for topic, difficulty, unanswered, wrong, and bookmarked items
+- Topic exams and composite mock exams
+- Practice mode and exam simulation mode
+- Countdown timer, flagging, answer review, and result breakdown
+- Progress analytics, weak-topic detection, and study history
+- Local persistence, import/export snapshot flow, and admin-ready data model
+- Responsive layout behavior for phone and tablet
 
-### Nguoi hoc
-
-- Xem onboarding va vao app bang Guest mode hoac mock login
-- Xem dashboard tong quan
-- Hoc theo danh sach chuyen de
-- Mo bai hoc va danh dau da hoc
-- Tim kiem bai hoc, cau hoi, chuyen de
-- Loc ngan hang cau hoi theo chuyen de, do kho, trang thai
-- Tao de thi thu va lam bai voi dong ho dem nguoc
-- Xem ket qua, review dap an, thong ke theo chuyen de
-- Bookmark bai hoc va cau hoi
-- Import/export du lieu hoc tap cuc bo
-
-### Quan tri noi dung trong tuong lai
-
-- Quan ly chuyen de, bai hoc, cau hoi, de thi
-- Import JSON/Excel
-- Dong bo nguoi hoc va thong ke len cloud
-
-## 3. Cong nghe
+## Tech Stack
 
 - React Native
 - Expo SDK 54
 - TypeScript
 - React Navigation
-- Zustand + AsyncStorage persist
+- Zustand + AsyncStorage
 - TanStack React Query
-- Zod + React Hook Form
+- React Hook Form + Zod
 - Expo FileSystem / Sharing / DocumentPicker
 - Expo Linear Gradient
 
-## 4. Kien truc
+## Architecture
 
-Ung dung duoc tach thanh 4 lop chinh:
+The app is organized into four main layers:
 
 1. Presentation
    - `src/components`
    - `src/features`
    - `src/navigation`
-
-2. State va app session
+2. State and session
    - `src/store`
-
-3. Business logic / service layer
+3. Business logic
    - `src/services`
    - `src/utils`
-
 4. Data source
    - `src/mock`
    - `src/services/repositories`
 
-### Dinh huong clean architecture practical
+This keeps UI concerns separate from data access and leaves a clean path for future API integration.
 
-- UI khong truy cap truc tiep seed raw neu co the tranh duoc
-- View model duoc tinh qua service layer
-- Repository dong vai tro data access abstraction
-- Persist local tach rieng khoi catalog seed
-
-## 5. Cau truc thu muc
+## Project Structure
 
 ```text
 .
 |-- App.tsx
+|-- CHANGELOG.md
+|-- README.md
 |-- app.json
 |-- babel.config.js
 |-- package.json
-|-- README.md
 `-- src
     |-- bootstrap
-    |   |-- AppLoadingScreen.tsx
-    |   |-- AppProviders.tsx
-    |   `-- AppRoot.tsx
     |-- components
     |-- constants
     |-- features
-    |   |-- analytics
-    |   |-- bookmarks
-    |   |-- exams
-    |   |-- home
-    |   |-- import-export
-    |   |-- onboarding
-    |   |-- profile
-    |   |-- questions
-    |   |-- search
-    |   `-- topics
     |-- hooks
     |-- mock
-    |   |-- seed.ts
-    |   `-- topics
     |-- navigation
     |-- services
-    |   |-- repositories
-    |   |-- dataTransferService.ts
-    |   |-- examService.ts
-    |   |-- homeService.ts
-    |   |-- questionBankService.ts
-    |   `-- topicService.ts
     |-- store
     |-- theme
     |-- types
     `-- utils
 ```
 
-## 6. Data model
+## Seed Data
 
-### Program
+The demo catalog currently includes:
 
-- `id`
-- `code`
-- `name`
-- `description`
-- `disclaimer`
+- 9 topics with preserved numbering: `1, 2, 3, 4, 5, 6, 7, 8, 10`
+- 27 lessons
+- 162 sample questions
+- Topic-based mock exams
+- 1 composite exam
+- Sample bookmarks, learner progress, and exam history
 
-### Topic
+The data model is intentionally flexible so Topic 9 or other future programs can be added later without redesigning the core app.
 
-- `id`
-- `code`
-- `name`
-- `shortDescription`
-- `learningObjectives`
-- `lessonIds`
-- `summary`
-- `flashSummary`
-- `tags`
-- `order`
-- `estimatedStudyTime`
-
-### Lesson
-
-- `id`
-- `topicId`
-- `title`
-- `content`
-- `keyPoints`
-- `quickNotes`
-- `example`
-- `references`
-- `estimatedStudyTime`
-
-### Question
-
-- `id`
-- `topicId`
-- `lessonId`
-- `question`
-- `options`
-- `correctAnswer`
-- `explanation`
-- `difficulty`
-- `tags`
-- `source`
-
-### ExamDefinition
-
-- `id`
-- `title`
-- `mode`
-- `topicIds`
-- `numberOfQuestions`
-- `durationMinutes`
-- `questionSelectionStrategy`
-- `passingScore`
-- `description`
-
-### Persisted learner state
-
-- `profile`
-- `preferences`
-- `bookmarks`
-- `lessonProgress`
-- `questionPerformance`
-- `history`
-- `reviewMap`
-- `activeSession`
-
-## 7. Du lieu seed hien co
-
-Phien ban hien tai da seed san:
-
-- 9 chuyen de: `1, 2, 3, 4, 5, 6, 7, 8, 10`
-- 27 bai hoc
-- 162 cau hoi mau
-- de thi theo tung chuyen de
-- 1 de thi tong hop
-- bookmark mau
-- tien do hoc mau
-- lich su lam bai mau
-
-Thiet ke hien tai giu nguyen numbering de cuong, ke ca khi chua co Chuyen de 9.
-
-## 8. Man hinh da trien khai
+## Implemented Screens
 
 - Onboarding
-- Auth gateway: Guest mode / mock login
+- Auth gateway with guest mode and mock login
 - Home dashboard
 - Topics list
 - Topic detail
@@ -237,58 +118,39 @@ Thiet ke hien tai giu nguyen numbering de cuong, ke ca khi chua co Chuyen de 9.
 - Search
 - Profile
 - Settings
-- Import / Export
+- Import / export
 
-## 9. Logic nghiep vu da co
+## Core Exam Logic
 
-- Tao de thi tu `ExamDefinition`
-- Random chon cau hoi
-- Shuffle thu tu dap an
+- Random question selection
+- Shuffled answer order
 - Practice mode
 - Exam simulation mode
-- Dong ho dem nguoc
-- Chuyen cau truoc / sau
-- Danh dau cau chua chac chan
-- Tu nop bai khi het gio
-- Cham diem
-- Breakdown theo chuyen de
-- Goi y chuyen de can on lai
-- Luu lich su va review dap an
+- Countdown timer
+- Previous / next navigation
+- Flag uncertain questions
+- Auto-submit on timeout
+- Score calculation
+- Per-topic result breakdown
+- Weak-topic recommendation
+- Answer review history
 
-## 10. UI/UX da polish
+## Run Locally
 
-- Design system nho gon nhung thong nhat
-- Hero banner cho onboarding, dashboard, topic detail, exam result
-- Responsive layout cho tablet qua max width container
-- Card, chip, progress, metric, chart duoc tai su dung
-- Mau sac theo huong hanh chinh - dao tao chuyen nghiep
-- Light / dark mode preference
+### Requirements
 
-## 11. Cach chay
-
-### Yeu cau
-
-- Node.js nen dung `>= 20.19.4`
+- Node.js `>= 20.19.4` recommended
 - npm 9+
 
-Luu y:
+Note: local verification in this workspace succeeded with Node `20.13.1`, but Expo SDK 54 recommends upgrading to `>= 20.19.4` for regular development and CI consistency.
 
-- Moi truong phat trien hien tai da verify duoc voi Node `20.13.1`
-- Tuy nhien Expo SDK 54 se canh bao engine, nen moi truong deploy/chay that nen nang cap dung version de xuat
-
-### Cai dependency
+### Install
 
 ```bash
 npm install
 ```
 
-### Typecheck
-
-```bash
-npm run typecheck
-```
-
-### Chay Expo
+### Development
 
 ```bash
 npm run start
@@ -297,70 +159,42 @@ npm run ios
 npm run web
 ```
 
-### Xoa cache Metro neu can
+### Verification
+
+```bash
+npm run typecheck
+npm run build:web
+```
+
+### Clear Metro cache
 
 ```bash
 npm run reset-cache
 ```
 
-## 12. Kiem tra da thuc hien
+## Import / Export
 
-Da chay thanh cong:
+The app includes a snapshot import/export screen to:
 
-- `npm run typecheck`
-- `npx expo export --platform web`
+- export persisted learner state as JSON
+- import a previous local backup
+- support admin-ready migration and content replacement workflows
 
-Chua chay trong moi truong hien tai:
+Imported files are validated with Zod before being accepted.
 
-- Android emulator runtime
-- iOS simulator runtime
+## CI
 
-## 13. Import / Export du lieu
+GitHub Actions runs on pushes and pull requests to `main` and verifies:
 
-Ung dung co san man hinh import/export snapshot:
+- dependency install with `npm ci`
+- TypeScript typecheck
+- Expo web export build
 
-- Export toan bo persisted learner state thanh JSON
-- Import lai snapshot JSON
-- Phu hop cho backup local, migration hoac flow admin-ready
+Workflow file: [ci.yml](./.github/workflows/ci.yml)
 
-File import duoc validate qua `Zod`.
+## Next Recommended Steps
 
-## 14. Huong mo rong tiep theo
-
-### Backend
-
-- REST API / GraphQL cho catalog, exams, analytics
-- Auth thuc su
-- Cloud sync cho lich su va tien do
-- CMS quan ly chuyen de / bai hoc / cau hoi / de thi
-
-### Learning intelligence
-
-- Ca nhan hoa lo trinh hoc
-- Goi y on lai theo weak topics
-- Streak rules nang cao
-- Nhac lich on tap
-- Heatmap on tap nang cao hon
-
-### Admin / operations
-
-- Import Excel / CSV / JSON bulk
-- Versioning cho question bank
-- Review workflow cho hoi dong chuyen mon
-- Telemetry, crash reporting, release channel
-
-## 15. Ghi chu ban giao
-
-Du an hien tai la MVP co the mo rong tot:
-
-- Da co luong app day du
-- Da co seed data lon de demo
-- Da co state offline va snapshot import/export
-- Da tach them service + repository de de noi backend that
-
-Neu tiep tuc phase tiep theo, uu tien nen la:
-
-1. Tich hop backend auth + catalog API
-2. Dua du lieu chuyen mon that vao he thong import
-3. Them test cho service layer va exam engine
-4. Chuan hoa CMS / admin workflow
+1. Integrate real authentication and backend APIs.
+2. Replace demo content with expert-reviewed official material.
+3. Add tests for the exam engine, services, and store flows.
+4. Introduce a CMS/admin workflow for question bank governance.
