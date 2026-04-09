@@ -6,6 +6,13 @@ export type ExamExperienceMode = 'practice' | 'simulation';
 export type QuestionSelectionStrategy = 'random' | 'topic-balanced' | 'lesson-balanced' | 'preset';
 export type OptionId = 'A' | 'B' | 'C' | 'D';
 export type AuthMode = 'guest' | 'mock' | null;
+export type DataTransferKind =
+  | 'import_snapshot'
+  | 'export_snapshot'
+  | 'export_question_bank_csv'
+  | 'export_exam_history_csv'
+  | 'export_topic_catalog_csv';
+export type DataTransferStatus = 'success' | 'canceled' | 'error';
 
 export interface Program {
   id: string;
@@ -222,6 +229,15 @@ export interface AppSnapshot {
   lessonProgress: Record<string, LessonProgress>;
   questionPerformance: Record<string, QuestionPerformance>;
   history: ExamHistoryEntry[];
+}
+
+export interface DataTransferRecord {
+  id: string;
+  kind: DataTransferKind;
+  status: DataTransferStatus;
+  createdAt: string;
+  fileName: string;
+  note?: string;
 }
 
 export interface LearningCatalog {

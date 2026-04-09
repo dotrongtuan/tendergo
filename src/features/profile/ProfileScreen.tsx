@@ -37,7 +37,7 @@ export function ProfileScreen() {
       </Card>
       <View style={styles.actions}>
         <Button label="Cài đặt" onPress={() => navigation.navigate('Settings')} />
-        <Button label="Import / Export dữ liệu" onPress={() => navigation.navigate('ImportExport')} variant="secondary" />
+        <Button label="Trung tâm dữ liệu" onPress={() => navigation.navigate('ImportExport')} variant="secondary" />
       </View>
     </AppScreen>
   );

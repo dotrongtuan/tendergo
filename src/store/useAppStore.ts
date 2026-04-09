@@ -15,6 +15,7 @@ import {
 import type {
   ExamReviewItem,
   AppSnapshot,
+  DataTransferRecord,
   ExamResult,
   ExamSession,
   LearnerProfile,
@@ -38,6 +39,7 @@ interface AppStoreState {
   activeSession: ExamSession | null;
   questionBankFilters: QuestionBankFilters;
   recentSearches: string[];
+  transferHistory: DataTransferRecord[];
   setHasHydrated: (value: boolean) => void;
   completeOnboarding: () => void;
   startGuestMode: () => void;
@@ -65,6 +67,7 @@ interface AppStoreState {
   abandonActiveSession: () => void;
   buildSnapshot: () => AppSnapshot;
   importSnapshot: (snapshot: AppSnapshot) => void;
+  recordTransfer: (record: Omit<DataTransferRecord, 'id' | 'createdAt'>) => void;
   resetToSeed: () => void;
 }
 
@@ -80,6 +83,7 @@ function buildInitialPersistedState() {
     activeSession: null as ExamSession | null,
     questionBankFilters: { ...DEFAULT_QUESTION_BANK_FILTERS },
     recentSearches: [...seededRecentSearches],
+    transferHistory: [] as DataTransferRecord[],
   };
 }
 
@@ -299,6 +303,17 @@ export const useAppStore = create<AppStoreState>()(
           reviewMap: {},
           activeSession: null,
         })),
+      recordTransfer: (record) =>
+        set((state) => ({
+          transferHistory: [
+            {
+              id: `transfer-${Date.now()}`,
+              createdAt: new Date().toISOString(),
+              ...record,
+            },
+            ...state.transferHistory,
+          ].slice(0, 20),
+        })),
       resetToSeed: () =>
         set((state) => ({
           ...buildInitialPersistedState(),
@@ -319,6 +334,7 @@ export const useAppStore = create<AppStoreState>()(
         activeSession: state.activeSession,
         questionBankFilters: state.questionBankFilters,
         recentSearches: state.recentSearches,
+        transferHistory: state.transferHistory,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
