@@ -18,6 +18,7 @@ export type RootStackParamList = {
   QuestionFilter: undefined;
   TopicExamSetup: { topicId: string };
   CompositeExamSetup: undefined;
+  ExamHistory: undefined;
   ExamSession: undefined;
   ExamResult: { historyId: string };
   ReviewAnswers: { historyId: string };

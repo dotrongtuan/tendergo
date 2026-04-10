@@ -1,6 +1,7 @@
 import type { QuestionBankFilters } from '../types/models';
 
 export const APP_NAME = 'TenderGO';
+export const APP_TAGLINE = 'Nền tảng ôn thi và đánh giá năng lực đấu thầu';
 export const PROGRAM_CODE = 'CTBD-DAUTHAU';
 export const APP_DISCLAIMER =
   'Dữ liệu lý thuyết và câu hỏi trong ứng dụng được tích hợp từ tài liệu chuyên đề do người dùng cung cấp. Khi đưa vào sử dụng chính thức, cần tiếp tục đối chiếu văn bản pháp luật hiện hành và được hội đồng chuyên môn rà soát.';

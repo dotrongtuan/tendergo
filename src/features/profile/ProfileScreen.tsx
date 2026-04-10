@@ -36,6 +36,7 @@ export function ProfileScreen() {
         <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>• Mục tiêu hiện tại: {profile.learningGoal}</Text>
       </Card>
       <View style={styles.actions}>
+        <Button label="Lịch sử thi" onPress={() => navigation.navigate('ExamHistory')} />
         <Button label="Cài đặt" onPress={() => navigation.navigate('Settings')} />
         <Button label="Trung tâm dữ liệu" onPress={() => navigation.navigate('ImportExport')} variant="secondary" />
       </View>

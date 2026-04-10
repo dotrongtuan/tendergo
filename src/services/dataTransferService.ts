@@ -4,7 +4,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
-import { APP_DISCLAIMER, APP_NAME } from '../constants/app';
+import { APP_DISCLAIMER, APP_NAME, APP_TAGLINE } from '../constants/app';
 import { dataTransferKindLabels } from '../constants/dataTransfer';
 import { snapshotSchema } from '../types/schemas';
 import type {
@@ -205,6 +205,31 @@ function buildStatusPill(label: string, tone: 'default' | 'success' | 'warning' 
   return `<span class="status-pill ${tone}">${escapeHtml(label)}</span>`;
 }
 
+function buildBrandMarkSvg() {
+  return `
+    <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeHtml(APP_NAME)} logo">
+      <defs>
+        <linearGradient id="tendergo-brand-gradient" x1="10%" y1="10%" x2="90%" y2="90%">
+          <stop offset="0%" stop-color="#0f2740" />
+          <stop offset="55%" stop-color="#1b5d8e" />
+          <stop offset="100%" stop-color="#4e8dc0" />
+        </linearGradient>
+        <linearGradient id="tendergo-brand-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5d9b0" />
+          <stop offset="100%" stop-color="#c48f4b" />
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4" width="64" height="64" rx="20" fill="url(#tendergo-brand-gradient)" />
+      <path d="M23 18h18l8 8v20c0 4.4-3.6 8-8 8H23c-4.4 0-8-3.6-8-8V26c0-4.4 3.6-8 8-8Z" fill="rgba(255,255,255,0.14)" />
+      <path d="M41 18v8h8" fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M24 31h17" stroke="rgba(255,255,255,0.9)" stroke-width="2.8" stroke-linecap="round" />
+      <path d="M24 38h14" stroke="rgba(255,255,255,0.72)" stroke-width="2.8" stroke-linecap="round" />
+      <path d="M24 45h10" stroke="rgba(255,255,255,0.56)" stroke-width="2.8" stroke-linecap="round" />
+      <circle cx="50" cy="48" r="11" fill="url(#tendergo-brand-accent)" />
+      <path d="M45.5 48.5 49 52l7-8" fill="none" stroke="#0f2740" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`;
+}
+
 function buildPdfDocument({
   documentCode,
   eyebrow,
@@ -251,18 +276,17 @@ function buildPdfDocument({
           align-items: center;
         }
         .brand-mark {
-          width: 56px;
-          height: 56px;
-          border-radius: 18px;
-          background: linear-gradient(135deg, #0f2740 0%, #1f5f8f 100%);
-          color: #ffffff;
+          width: 72px;
+          height: 72px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
-          font-weight: 700;
-          letter-spacing: 1px;
-          box-shadow: 0 12px 30px rgba(15, 39, 64, 0.16);
+          flex: 0 0 72px;
+        }
+        .brand-mark svg {
+          width: 72px;
+          height: 72px;
+          display: block;
         }
         .brand-copy span,
         .document-code,
@@ -282,7 +306,7 @@ function buildPdfDocument({
         }
         .brand-copy strong {
           display: block;
-          font-size: 18px;
+          font-size: 22px;
           color: #0f2740;
         }
         .brand-copy p {
@@ -290,6 +314,11 @@ function buildPdfDocument({
           color: #5e7288;
           font-size: 12px;
           line-height: 1.6;
+        }
+        .brand-copy .brand-tagline {
+          color: #244667;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 13px;
         }
         .document-code {
           border: 1px solid #c8d6e5;
@@ -571,11 +600,12 @@ function buildPdfDocument({
       <div class="sheet">
         <div class="masthead">
           <div class="brand">
-            <div class="brand-mark">TG</div>
+            <div class="brand-mark">${buildBrandMarkSvg()}</div>
             <div class="brand-copy">
-              <span>${escapeHtml(APP_NAME)}</span>
-              <strong>Bo ho so on tap va danh gia</strong>
-              <p>Ban in phuc vu van hanh noi bo, doi chieu noi dung va tong hop ket qua hoc tap.</p>
+              <span>Hồ sơ sản phẩm chính thức</span>
+              <strong>${escapeHtml(APP_NAME)}</strong>
+              <p class="brand-tagline">${escapeHtml(APP_TAGLINE)}</p>
+              <p>Bản in phục vụ vận hành nội bộ, đối chiếu nội dung và tổng hợp kết quả học tập.</p>
             </div>
           </div>
           <div class="document-code">${escapeHtml(documentCode)}</div>
@@ -585,9 +615,9 @@ function buildPdfDocument({
           <h1>${escapeHtml(title)}</h1>
           <p>${escapeHtml(subtitle)}</p>
           <div class="meta-inline">
-            <span>Ngay lap: ${escapeHtml(formatReportDate(generatedAt))}</span>
-            <span>Nen tang: ${escapeHtml(APP_NAME)}</span>
-            <span>Che do du lieu: offline ready</span>
+            <span>Ngày lập: ${escapeHtml(formatReportDate(generatedAt))}</span>
+            <span>Nền tảng: ${escapeHtml(APP_NAME)}</span>
+            <span>Chế độ dữ liệu: offline ready</span>
           </div>
         </div>
         <div class="metric-grid">${renderMetricCards(heroMetrics)}</div>
@@ -864,7 +894,7 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
   ];
 
   return buildPdfDocument({
-    documentCode: 'ADMIN REPORT',
+    documentCode: 'TG-ADMIN-REPORT',
     eyebrow: 'Báo cáo vận hành nội dung',
     title: 'Báo cáo dữ liệu và ôn tập',
     subtitle: `${catalog.program.name}. Tài liệu tổng hợp dành cho quản trị nội dung, đối chiếu seed và theo dõi kết quả học tập.`,
@@ -1087,7 +1117,7 @@ function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: Bu
     : `Kết quả hiện tại là ${historyEntry.scorePercentage}%, thấp hơn mốc đạt ${passingScore}%. Nên ưu tiên rà lại các chuyên đề yếu và các câu sai ở phần cuối báo cáo.`;
 
   return buildPdfDocument({
-    documentCode: 'EXAM RESULT',
+    documentCode: `TG-EXAM-${historyEntry.id.slice(-6).toUpperCase()}`,
     eyebrow: 'Hồ sơ kết quả bài thi',
     title: historyEntry.title,
     subtitle: `Phiếu tổng hợp dành cho học viên ${profile.displayName}, ghi nhận kết quả và các điểm cần ôn lại sau bài làm.`,

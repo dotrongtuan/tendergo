@@ -65,6 +65,7 @@ export function HomeDashboardScreen() {
         <SectionHeader title="Hành động nhanh" />
         <View style={styles.actions}>
           <Button label="Thi thử tổng hợp" onPress={() => navigation.navigate('CompositeExamSetup')} />
+          <Button label="Lịch sử thi" onPress={() => navigation.navigate('ExamHistory')} variant="secondary" />
           <Button label="Mở bookmark" onPress={() => navigation.navigate('Bookmarks')} variant="secondary" />
         </View>
       </Card>
@@ -90,7 +91,7 @@ export function HomeDashboardScreen() {
         })}
       </View>
       <Card>
-        <SectionHeader title="Lịch sử làm bài gần đây" />
+        <SectionHeader title="Lịch sử làm bài gần đây" actionLabel="Xem tất cả" onPressAction={() => navigation.navigate('ExamHistory')} />
         {dashboard.recentHistory.map((item) => (
           <View key={item.id} style={styles.historyRow}>
             <View style={{ flex: 1 }}>

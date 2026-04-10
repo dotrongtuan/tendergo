@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { BookmarksScreen } from '../features/bookmarks/BookmarksScreen';
 import { CompositeExamSetupScreen } from '../features/exams/CompositeExamSetupScreen';
+import { ExamHistoryScreen } from '../features/exams/ExamHistoryScreen';
 import { ExamResultScreen } from '../features/exams/ExamResultScreen';
 import { ExamSessionScreen } from '../features/exams/ExamSessionScreen';
 import { ReviewAnswersScreen } from '../features/exams/ReviewAnswersScreen';
@@ -44,6 +45,7 @@ export function AppNavigator() {
             <Stack.Screen name="QuestionFilter" component={QuestionFilterScreen} options={{ presentation: 'modal' }} />
             <Stack.Screen name="TopicExamSetup" component={TopicExamSetupScreen} />
             <Stack.Screen name="CompositeExamSetup" component={CompositeExamSetupScreen} />
+            <Stack.Screen name="ExamHistory" component={ExamHistoryScreen} />
             <Stack.Screen name="ExamSession" component={ExamSessionScreen} />
             <Stack.Screen name="ExamResult" component={ExamResultScreen} />
             <Stack.Screen name="ReviewAnswers" component={ReviewAnswersScreen} />
