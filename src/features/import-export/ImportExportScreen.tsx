@@ -11,6 +11,7 @@ import { SectionHeader } from '../../components/SectionHeader';
 import { useCatalogQuery } from '../../hooks/useCatalogQueries';
 import { useRootNavigation } from '../../navigation/helpers';
 import {
+  exportAdminReportPdf,
   exportExamHistoryCsv,
   exportQuestionBankCsv,
   exportSnapshotFile,
@@ -32,6 +33,7 @@ const transferKindLabels = {
   export_question_bank_csv: 'Xuất CSV ngân hàng câu hỏi',
   export_exam_history_csv: 'Xuất CSV lịch sử ôn tập',
   export_topic_catalog_csv: 'Xuất CSV danh mục chuyên đề',
+  export_admin_report_pdf: 'Xuất báo cáo PDF',
 } as const;
 
 export function ImportExportScreen() {
@@ -39,6 +41,7 @@ export function ImportExportScreen() {
   const theme = useAppTheme();
   const { data } = useCatalogQuery();
   const history = useAppStore((state) => state.history);
+  const profile = useAppStore((state) => state.profile);
   const transferHistory = useAppStore((state) => state.transferHistory);
   const buildSnapshot = useAppStore((state) => state.buildSnapshot);
   const importSnapshot = useAppStore((state) => state.importSnapshot);
@@ -142,6 +145,28 @@ export function ImportExportScreen() {
             onPress={() =>
               handleExport('export_snapshot', 'tendergo-snapshot.json', () => exportSnapshotFile(buildSnapshot()), (fileName) => `Đã export snapshot tới ${fileName}.`)
             }
+          />
+          <Button
+            label="Xuất báo cáo PDF"
+            variant="secondary"
+            onPress={() =>
+              data
+                ? handleExport(
+                    'export_admin_report_pdf',
+                    'tendergo-admin-report.pdf',
+                    () =>
+                      exportAdminReportPdf({
+                        profile,
+                        catalog: data,
+                        history,
+                        transferHistory,
+                      }),
+                    (fileName) =>
+                      `Đã tạo báo cáo PDF ${fileName}. Trên web, trình duyệt có thể mở hộp thoại in để lưu thành PDF.`,
+                  )
+                : undefined
+            }
+            disabled={!data}
           />
           <Button
             label="Export ngân hàng câu hỏi CSV"
