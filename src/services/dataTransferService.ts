@@ -2,6 +2,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import QRCode from 'qrcode';
 import { Platform } from 'react-native';
 
 import { APP_DISCLAIMER, APP_NAME, APP_TAGLINE } from '../constants/app';
@@ -150,6 +151,13 @@ interface ReportMetric {
   helper?: string;
 }
 
+interface VerificationInfo {
+  code: string;
+  payload: string;
+  description: string;
+  qrSvg: string;
+}
+
 interface PdfDocumentParams {
   documentCode: string;
   eyebrow: string;
@@ -158,6 +166,7 @@ interface PdfDocumentParams {
   generatedAt: string;
   heroMetrics: ReportMetric[];
   bodyHtml: string;
+  verification?: VerificationInfo;
   footerTitle?: string;
   footerNote?: string;
 }
@@ -230,7 +239,47 @@ function buildBrandMarkSvg() {
     </svg>`;
 }
 
-function buildPdfDocument({
+function hashString(value: string) {
+  let hash = 0x811c9dc5;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+}
+
+async function buildVerificationInfo(payload: Record<string, string | number | boolean | null | undefined>) {
+  const canonicalPayload = JSON.stringify(payload);
+  const signature = hashString(`TenderGO::${canonicalPayload}`);
+  const code = `TGX-${signature}`;
+  const qrPayload = JSON.stringify({
+    ...payload,
+    verificationCode: code,
+    signature,
+  });
+  const qrSvg = (await QRCode.toString(qrPayload, {
+    type: 'svg',
+    errorCorrectionLevel: 'M',
+    margin: 0,
+    width: 140,
+    color: {
+      dark: '#0f2740',
+      light: '#ffffff',
+    },
+  })).replace(/<\?xml[^>]*\?>\s*/i, '');
+
+  return {
+    code,
+    payload: qrPayload,
+    description:
+      'Mã QR và mã xác thực này dùng cho đối chiếu nội bộ trong TenderGO. Không thay thế quy trình xác minh pháp lý hoặc văn bản chính thức.',
+    qrSvg,
+  } satisfies VerificationInfo;
+}
+
+async function buildPdfDocument({
   documentCode,
   eyebrow,
   title,
@@ -238,6 +287,7 @@ function buildPdfDocument({
   generatedAt,
   heroMetrics,
   bodyHtml,
+  verification,
   footerTitle = 'Lưu ý nghiệp vụ',
   footerNote = APP_DISCLAIMER,
 }: PdfDocumentParams) {
@@ -579,6 +629,72 @@ function buildPdfDocument({
           flex: 0 0 22px;
           margin-top: 1px;
         }
+        .verification-panel {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          margin-top: 20px;
+          padding: 16px 18px;
+          border: 1px solid #dbe4ee;
+          border-radius: 20px;
+          background: linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%);
+          page-break-inside: avoid;
+        }
+        .verification-copy {
+          flex: 1;
+          min-width: 0;
+        }
+        .verification-copy strong {
+          display: block;
+          color: #0f2740;
+          font-size: 16px;
+          margin-bottom: 6px;
+          font-family: Georgia, "Times New Roman", serif;
+        }
+        .verification-meta {
+          display: grid;
+          gap: 6px;
+          margin-top: 12px;
+        }
+        .verification-code {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          max-width: 100%;
+          padding: 7px 12px;
+          border-radius: 999px;
+          border: 1px solid #ccd8e4;
+          background: #ffffff;
+          color: #17324d;
+          font-size: 11px;
+          line-height: 1.4;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          word-break: break-all;
+        }
+        .verification-payload {
+          color: #62788f;
+          font-size: 10px;
+          line-height: 1.6;
+          word-break: break-all;
+        }
+        .verification-qr {
+          width: 132px;
+          height: 132px;
+          flex: 0 0 132px;
+          border-radius: 18px;
+          background: #ffffff;
+          border: 1px solid #d9e4ef;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 10px;
+        }
+        .verification-qr svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
         .footer {
           margin-top: 20px;
           padding-top: 16px;
@@ -622,6 +738,22 @@ function buildPdfDocument({
         </div>
         <div class="metric-grid">${renderMetricCards(heroMetrics)}</div>
         ${bodyHtml}
+        ${
+          verification
+            ? `
+              <div class="verification-panel">
+                <div class="verification-copy">
+                  <strong>Xác thực nội bộ</strong>
+                  <p>${escapeHtml(verification.description)}</p>
+                  <div class="verification-meta">
+                    <span class="verification-code">${escapeHtml(verification.code)}</span>
+                    <span class="verification-payload">${escapeHtml(compactText(verification.payload, 220))}</span>
+                  </div>
+                </div>
+                <div class="verification-qr">${verification.qrSvg}</div>
+              </div>`
+            : ''
+        }
         <div class="footer">
           <p><strong>${escapeHtml(footerTitle)}:</strong> ${escapeHtml(footerNote)}</p>
         </div>
@@ -799,7 +931,7 @@ function buildTopicPerformanceSummary(catalog: LearningCatalog, history: ExamHis
   return { strongest, weakest };
 }
 
-function buildAdminReportHtml({ profile, catalog, history, transferHistory }: BuildAdminReportParams) {
+async function buildAdminReportHtml({ profile, catalog, history, transferHistory }: BuildAdminReportParams) {
   const sourceTopics = catalog.topics.filter((topic) => topic.sourceDocument);
   const sourceExams = catalog.exams.filter((exam) => exam.sourceFile);
   const importedFiles = Array.from(
@@ -893,6 +1025,17 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
       : 'Chưa đủ dữ liệu để xác định chuyên đề yếu nhất.',
   ];
 
+  const verification = await buildVerificationInfo({
+    documentType: 'admin_report',
+    documentCode: 'TG-ADMIN-REPORT',
+    profileId: profile.id,
+    issuedTo: profile.displayName,
+    generatedAt,
+    sourceTopicCount: sourceTopics.length,
+    sourceExamCount: sourceExams.length,
+    historyCount: history.length,
+  });
+
   return buildPdfDocument({
     documentCode: 'TG-ADMIN-REPORT',
     eyebrow: 'Báo cáo vận hành nội dung',
@@ -905,6 +1048,7 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
       { label: 'Câu hỏi', value: `${catalog.questions.length}`, helper: 'Ngân hàng hiện có' },
       { label: 'Điểm trung bình', value: averageScore === null ? '--' : `${averageScore}%`, helper: 'Theo lịch sử thi' },
     ],
+    verification,
     bodyHtml: `
       <section class="section-card">
         <span class="section-eyebrow">Tóm tắt điều hành</span>
@@ -1022,7 +1166,7 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
       </section>`,
   });
 }
-function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: BuildExamResultReportParams) {
+async function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: BuildExamResultReportParams) {
   const examDefinition = catalog.exams.find((exam) => exam.id === historyEntry.examId);
   const passingScore = examDefinition?.passingScore ?? 75;
   const passed = historyEntry.scorePercentage >= passingScore;
@@ -1116,6 +1260,17 @@ function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: Bu
     ? `Học viên đã vượt mốc đạt ${passingScore}% với kết quả ${historyEntry.scorePercentage}%. Có thể chuyển sang vòng luyện đề tổng hợp hoặc mô phỏng thi.`
     : `Kết quả hiện tại là ${historyEntry.scorePercentage}%, thấp hơn mốc đạt ${passingScore}%. Nên ưu tiên rà lại các chuyên đề yếu và các câu sai ở phần cuối báo cáo.`;
 
+  const verification = await buildVerificationInfo({
+    documentType: 'exam_result',
+    documentCode: `TG-EXAM-${historyEntry.id.slice(-6).toUpperCase()}`,
+    historyId: historyEntry.id,
+    examId: historyEntry.examId,
+    issuedTo: profile.displayName,
+    completedAt: historyEntry.completedAt,
+    score: historyEntry.scorePercentage,
+    totalQuestions: historyEntry.totalQuestions,
+  });
+
   return buildPdfDocument({
     documentCode: `TG-EXAM-${historyEntry.id.slice(-6).toUpperCase()}`,
     eyebrow: 'Hồ sơ kết quả bài thi',
@@ -1128,6 +1283,7 @@ function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: Bu
       { label: 'Đã trả lời', value: `${answeredCount}/${historyEntry.totalQuestions}`, helper: `${historyEntry.flaggedCount} câu đã đánh dấu` },
       { label: 'Thời gian', value: formatDurationSeconds(historyEntry.durationSeconds), helper: getExperienceModeLabel(historyEntry.experienceMode) },
     ],
+    verification,
     bodyHtml: `
       <section class="section-card">
         <span class="section-eyebrow">Kết luận nhanh</span>
@@ -1234,12 +1390,14 @@ export async function exportTopicCatalogCsv(catalog: LearningCatalog) {
 }
 
 export async function exportAdminReportPdf(params: BuildAdminReportParams) {
-  return exportPdfFile(buildAdminReportHtml(params), buildPdfFileName('admin-report'));
+  const html = await buildAdminReportHtml(params);
+  return exportPdfFile(html, buildPdfFileName('admin-report'));
 }
 
 export async function exportExamResultPdf(params: BuildExamResultReportParams) {
   const prefix = `exam-result-${buildSafeFileSegment(params.historyEntry.title)}`;
-  return exportPdfFile(buildExamResultHtml(params), buildPdfFileName(prefix));
+  const html = await buildExamResultHtml(params);
+  return exportPdfFile(html, buildPdfFileName(prefix));
 }
 
 export async function exportSnapshotFile(snapshot: AppSnapshot) {

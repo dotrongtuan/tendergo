@@ -1,5 +1,5 @@
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
 import { AppScreen } from '../../components/AppScreen';
 import { Button } from '../../components/Button';
@@ -14,9 +14,47 @@ import { useAppStore } from '../../store/useAppStore';
 import { useAppTheme } from '../../theme';
 import { formatDateTime, formatDurationSeconds, getExamCatalogModeLabel, getExperienceModeLabel } from '../../utils/format';
 
+type ScoreFilter = 'all' | 'under75' | 'pass' | 'excellent';
+type TimeFilter = 'all' | '7d' | '30d' | '90d';
+
+interface FilterChipProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}
+
 function resolveFileName(location: string, fallback: string) {
   const segments = location.split(/[\\/]/).filter(Boolean);
   return segments.at(-1) ?? fallback;
+}
+
+function FilterChip({ label, active, onPress }: FilterChipProps) {
+  const theme = useAppTheme();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.chip,
+        {
+          backgroundColor: active ? theme.colors.primary : theme.colors.surfaceMuted,
+          borderColor: active ? theme.colors.primary : theme.colors.border,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.chipLabel,
+          {
+            color: active ? '#ffffff' : theme.colors.text,
+            fontFamily: active ? theme.typography.label : theme.typography.bodyMedium,
+          },
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
 }
 
 export function ExamHistoryScreen() {
@@ -29,10 +67,47 @@ export function ExamHistoryScreen() {
   const recordTransfer = useAppStore((state) => state.recordTransfer);
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('all');
+  const [scoreFilter, setScoreFilter] = useState<ScoreFilter>('all');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   const topicNameMap = useMemo(() => {
     return new Map((data?.topics ?? []).map((topic) => [topic.id, topic.name]));
   }, [data]);
+
+  const availableTopics = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    return data.topics.filter((topic) => history.some((entry) => entry.topicBreakdown.some((item) => item.topicId === topic.id)));
+  }, [data, history]);
+
+  const filteredHistory = useMemo(() => {
+    const now = Date.now();
+    const thresholdByFilter: Record<Exclude<TimeFilter, 'all'>, number> = {
+      '7d': 7,
+      '30d': 30,
+      '90d': 90,
+    };
+
+    return history.filter((entry) => {
+      const matchesTopic =
+        selectedTopicId === 'all' || entry.topicBreakdown.some((item) => item.topicId === selectedTopicId);
+
+      const matchesScore =
+        scoreFilter === 'all' ||
+        (scoreFilter === 'under75' && entry.scorePercentage < 75) ||
+        (scoreFilter === 'pass' && entry.scorePercentage >= 75) ||
+        (scoreFilter === 'excellent' && entry.scorePercentage >= 90);
+
+      const matchesTime =
+        timeFilter === 'all' ||
+        now - new Date(entry.completedAt).getTime() <= thresholdByFilter[timeFilter] * 24 * 60 * 60 * 1000;
+
+      return matchesTopic && matchesScore && matchesTime;
+    });
+  }, [history, scoreFilter, selectedTopicId, timeFilter]);
 
   const overview = useMemo(() => {
     const attemptCount = history.length;
@@ -49,6 +124,22 @@ export function ExamHistoryScreen() {
       reviewReadyCount,
     };
   }, [history, reviewMap]);
+
+  const filterSummary = useMemo(() => {
+    const topicLabel =
+      selectedTopicId === 'all' ? 'Tất cả chuyên đề' : availableTopics.find((topic) => topic.id === selectedTopicId)?.name ?? 'Theo chuyên đề';
+    const scoreLabel =
+      scoreFilter === 'all'
+        ? 'Mọi mức điểm'
+        : scoreFilter === 'under75'
+          ? 'Dưới 75%'
+          : scoreFilter === 'pass'
+            ? 'Từ 75%'
+            : 'Từ 90%';
+    const timeLabel = timeFilter === 'all' ? 'Toàn bộ thời gian' : `Trong ${timeFilter.replace('d', '')} ngày gần đây`;
+
+    return `${filteredHistory.length} bài • ${topicLabel} • ${scoreLabel} • ${timeLabel}`;
+  }, [availableTopics, filteredHistory.length, scoreFilter, selectedTopicId, timeFilter]);
 
   const handleExportPdf = async (historyId: string) => {
     if (!data || exportingId) {
@@ -71,7 +162,7 @@ export function ExamHistoryScreen() {
         reviewItems: reviewMap[historyId] ?? [],
       });
       const fileName = resolveFileName(location, 'tendergo-exam-result.pdf');
-      const message = `Đã tạo PDF kết quả ${fileName}.`;
+      const message = `Đã tạo PDF kết quả ${fileName}. Trên web, trình duyệt có thể mở hộp thoại in để lưu thành PDF.`;
       setStatus(`${historyEntry.title} • ${message}`);
       recordTransfer({
         kind: 'export_exam_result_pdf',
@@ -107,7 +198,7 @@ export function ExamHistoryScreen() {
           <HeroBanner
             eyebrow="Kho kết quả cá nhân"
             title="Tất cả bài thi của bạn ở một nơi"
-            description="Theo dõi tiến trình đã làm, mở lại chi tiết từng bài và xuất hồ sơ PDF bất cứ lúc nào."
+            description="Theo dõi tiến trình đã làm, lọc theo mục tiêu ôn tập và xuất hồ sơ PDF bất cứ lúc nào."
             stats={[
               { label: 'Lượt làm', value: `${overview.attemptCount}` },
               { label: 'Điểm TB', value: `${overview.averageScore}%` },
@@ -139,53 +230,113 @@ export function ExamHistoryScreen() {
             </Text>
           </Card>
 
-          {history.map((entry) => {
-            const weakTopics = entry.weakTopicIds
-              .map((topicId) => topicNameMap.get(topicId) ?? topicId)
-              .slice(0, 3)
-              .join(', ');
+          <Card>
+            <Text style={[styles.sectionTitle, { color: theme.colors.heading, fontFamily: theme.typography.heading }]}>
+              Bộ lọc lịch sử
+            </Text>
 
-            return (
-              <Card key={entry.id}>
-                <View style={styles.headerRow}>
-                  <View style={styles.headerMain}>
-                    <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
-                      {entry.title}
-                    </Text>
-                    <Text style={[styles.rowMeta, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
-                      {formatDateTime(entry.completedAt)} • {getExamCatalogModeLabel(entry.catalogMode)} • {getExperienceModeLabel(entry.experienceMode)}
+            <View style={styles.filterGroup}>
+              <Text style={[styles.filterLabel, { color: theme.colors.textMuted, fontFamily: theme.typography.label }]}>
+                Chuyên đề
+              </Text>
+              <View style={styles.chipRow}>
+                <FilterChip label="Tất cả" active={selectedTopicId === 'all'} onPress={() => setSelectedTopicId('all')} />
+                {availableTopics.map((topic) => (
+                  <FilterChip
+                    key={topic.id}
+                    label={topic.code}
+                    active={selectedTopicId === topic.id}
+                    onPress={() => setSelectedTopicId(topic.id)}
+                  />
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.filterGroup}>
+              <Text style={[styles.filterLabel, { color: theme.colors.textMuted, fontFamily: theme.typography.label }]}>
+                Mức điểm
+              </Text>
+              <View style={styles.chipRow}>
+                <FilterChip label="Tất cả" active={scoreFilter === 'all'} onPress={() => setScoreFilter('all')} />
+                <FilterChip label="< 75%" active={scoreFilter === 'under75'} onPress={() => setScoreFilter('under75')} />
+                <FilterChip label=">= 75%" active={scoreFilter === 'pass'} onPress={() => setScoreFilter('pass')} />
+                <FilterChip label=">= 90%" active={scoreFilter === 'excellent'} onPress={() => setScoreFilter('excellent')} />
+              </View>
+            </View>
+
+            <View style={styles.filterGroup}>
+              <Text style={[styles.filterLabel, { color: theme.colors.textMuted, fontFamily: theme.typography.label }]}>
+                Thời gian
+              </Text>
+              <View style={styles.chipRow}>
+                <FilterChip label="Tất cả" active={timeFilter === 'all'} onPress={() => setTimeFilter('all')} />
+                <FilterChip label="7 ngày" active={timeFilter === '7d'} onPress={() => setTimeFilter('7d')} />
+                <FilterChip label="30 ngày" active={timeFilter === '30d'} onPress={() => setTimeFilter('30d')} />
+                <FilterChip label="90 ngày" active={timeFilter === '90d'} onPress={() => setTimeFilter('90d')} />
+              </View>
+            </View>
+
+            <Text style={[styles.filterSummary, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
+              {filterSummary}
+            </Text>
+          </Card>
+
+          {filteredHistory.length ? (
+            filteredHistory.map((entry) => {
+              const weakTopics = entry.weakTopicIds
+                .map((topicId) => topicNameMap.get(topicId) ?? topicId)
+                .slice(0, 3)
+                .join(', ');
+
+              return (
+                <Card key={entry.id}>
+                  <View style={styles.headerRow}>
+                    <View style={styles.headerMain}>
+                      <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
+                        {entry.title}
+                      </Text>
+                      <Text style={[styles.rowMeta, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
+                        {formatDateTime(entry.completedAt)} • {getExamCatalogModeLabel(entry.catalogMode)} • {getExperienceModeLabel(entry.experienceMode)}
+                      </Text>
+                    </View>
+                    <Text style={[styles.score, { color: theme.colors.primary, fontFamily: theme.typography.heading }]}>
+                      {entry.scorePercentage}%
                     </Text>
                   </View>
-                  <Text style={[styles.score, { color: theme.colors.primary, fontFamily: theme.typography.heading }]}>
-                    {entry.scorePercentage}%
-                  </Text>
-                </View>
 
-                <View style={styles.metaGrid}>
-                  <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
-                    Đúng: {entry.correctCount}/{entry.totalQuestions}
-                  </Text>
-                  <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
-                    Thời gian: {formatDurationSeconds(entry.durationSeconds)}
-                  </Text>
-                </View>
+                  <View style={styles.metaGrid}>
+                    <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+                      Đúng: {entry.correctCount}/{entry.totalQuestions}
+                    </Text>
+                    <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+                      Thời gian: {formatDurationSeconds(entry.durationSeconds)}
+                    </Text>
+                  </View>
 
-                <Text style={[styles.body, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
-                  {weakTopics ? `Cần ôn lại: ${weakTopics}` : 'Kết quả khá đồng đều, có thể tiếp tục nâng độ khó.'}
-                </Text>
+                  <Text style={[styles.body, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
+                    {weakTopics ? `Cần ôn lại: ${weakTopics}` : 'Kết quả khá đồng đều, có thể tiếp tục nâng độ khó.'}
+                  </Text>
 
-                <View style={styles.actions}>
-                  <Button label="Xem kết quả" onPress={() => navigation.navigate('ExamResult', { historyId: entry.id })} />
-                  <Button
-                    label={exportingId === entry.id ? 'Đang xuất PDF...' : 'Xuất PDF'}
-                    onPress={() => handleExportPdf(entry.id)}
-                    variant="secondary"
-                    disabled={!data || exportingId !== null}
-                  />
-                </View>
-              </Card>
-            );
-          })}
+                  <View style={styles.actions}>
+                    <Button label="Xem kết quả" onPress={() => navigation.navigate('ExamResult', { historyId: entry.id })} />
+                    <Button
+                      label={exportingId === entry.id ? 'Đang xuất PDF...' : 'Xuất PDF'}
+                      onPress={() => handleExportPdf(entry.id)}
+                      variant="secondary"
+                      disabled={!data || exportingId !== null}
+                    />
+                  </View>
+                </Card>
+              );
+            })
+          ) : (
+            <Card>
+              <EmptyState
+                title="Không có bài phù hợp bộ lọc"
+                description="Hãy đổi chuyên đề, mức điểm hoặc khoảng thời gian để xem lại các bài đã làm."
+              />
+            </Card>
+          )}
         </>
       ) : (
         <EmptyState
@@ -207,4 +358,17 @@ const styles = StyleSheet.create({
   score: { fontSize: 22 },
   metaGrid: { flexDirection: 'row', gap: 16, flexWrap: 'wrap' },
   actions: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
+  filterGroup: { gap: 8 },
+  filterLabel: { fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.8 },
+  chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  chip: {
+    minHeight: 34,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chipLabel: { fontSize: 12, lineHeight: 16 },
+  filterSummary: { fontSize: 12, lineHeight: 18 },
 });
