@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppScreen } from '../../components/AppScreen';
@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { MetricCard } from '../../components/MetricCard';
 import { PageHeader } from '../../components/PageHeader';
 import { SectionHeader } from '../../components/SectionHeader';
+import { dataTransferKindLabels } from '../../constants/dataTransfer';
 import { useCatalogQuery } from '../../hooks/useCatalogQueries';
 import { useRootNavigation } from '../../navigation/helpers';
 import {
@@ -26,15 +27,6 @@ function resolveFileName(location: string, fallback: string) {
   const segments = location.split(/[\\/]/).filter(Boolean);
   return segments.at(-1) ?? fallback;
 }
-
-const transferKindLabels = {
-  import_snapshot: 'Import snapshot',
-  export_snapshot: 'Export snapshot',
-  export_question_bank_csv: 'Xuất CSV ngân hàng câu hỏi',
-  export_exam_history_csv: 'Xuất CSV lịch sử ôn tập',
-  export_topic_catalog_csv: 'Xuất CSV danh mục chuyên đề',
-  export_admin_report_pdf: 'Xuất báo cáo PDF',
-} as const;
 
 export function ImportExportScreen() {
   const navigation = useRootNavigation();
@@ -70,7 +62,7 @@ export function ImportExportScreen() {
   }, [data, history, transferHistory]);
 
   const handleExport = async (
-    kind: keyof typeof transferKindLabels,
+    kind: keyof typeof dataTransferKindLabels,
     fallbackFileName: string,
     action: () => Promise<string>,
     successMessage: (fileName: string) => string,
@@ -102,7 +94,7 @@ export function ImportExportScreen() {
     <AppScreen>
       <PageHeader
         title="Trung tâm dữ liệu"
-        description="Khu vực admin-ready để theo dõi seed nội dung, xuất CSV phục vụ rà soát nghiệp vụ và import/export dữ liệu local."
+        description="Khu vực admin-ready để theo dõi seed nội dung, xuất báo cáo rà soát nghiệp vụ và import/export dữ liệu local."
         onBackPress={() => navigation.goBack()}
       />
       <View style={styles.metrics}>
@@ -113,6 +105,7 @@ export function ImportExportScreen() {
         <MetricCard label="Đề thi" value={`${data?.exams.length ?? 0}`} helper="Gồm đề nguồn và đề sinh" />
         <MetricCard label="Lịch sử thi" value={`${history.length}`} helper="Lưu cục bộ trên thiết bị" />
       </View>
+
       <Card>
         <SectionHeader title="Nguồn dữ liệu đang dùng" subtitle="Tổng hợp cho quản trị nội dung" />
         <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
@@ -126,9 +119,7 @@ export function ImportExportScreen() {
         </Text>
         {overview?.importedFiles.length ? (
           <>
-            <Text style={[styles.subTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
-              File nguồn đã nạp
-            </Text>
+            <Text style={[styles.subTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>File nguồn đã nạp</Text>
             {overview.importedFiles.map((fileName) => (
               <Text key={fileName} style={[styles.body, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
                 • {fileName}
@@ -137,8 +128,9 @@ export function ImportExportScreen() {
           </>
         ) : null}
       </Card>
+
       <Card>
-        <SectionHeader title="Xuất dữ liệu nội bộ" subtitle="CSV mở được bằng Excel để rà soát hoặc nhập sang hệ khác" />
+        <SectionHeader title="Xuất dữ liệu nội bộ" subtitle="CSV mở được bằng Excel, PDF phù hợp cho báo cáo và rà soát" />
         <View style={styles.actions}>
           <Button
             label="Export snapshot JSON"
@@ -161,8 +153,7 @@ export function ImportExportScreen() {
                         history,
                         transferHistory,
                       }),
-                    (fileName) =>
-                      `Đã tạo báo cáo PDF ${fileName}. Trên web, trình duyệt có thể mở hộp thoại in để lưu thành PDF.`,
+                    (fileName) => `Đã tạo báo cáo PDF ${fileName}. Trên web, trình duyệt có thể mở hộp thoại in để lưu thành PDF.`,
                   )
                 : undefined
             }
@@ -215,6 +206,7 @@ export function ImportExportScreen() {
           />
         </View>
       </Card>
+
       <Card>
         <SectionHeader title="Nhập dữ liệu local" subtitle="Phục vụ khôi phục và nhập lịch sử học đã backup" />
         <Button
@@ -257,12 +249,12 @@ export function ImportExportScreen() {
           }}
         />
       </Card>
+
       <Card>
-        <Text style={[styles.statusTitle, { color: theme.colors.heading, fontFamily: theme.typography.heading }]}>
-          Trạng thái gần nhất
-        </Text>
+        <Text style={[styles.statusTitle, { color: theme.colors.heading, fontFamily: theme.typography.heading }]}>Trạng thái gần nhất</Text>
         <Text style={[styles.body, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>{status}</Text>
       </Card>
+
       <Card>
         <SectionHeader title="Lịch sử thao tác dữ liệu" subtitle="Audit trail cục bộ cho import/export" />
         {overview?.recentTransfers.length ? (
@@ -270,7 +262,7 @@ export function ImportExportScreen() {
             <View key={item.id} style={styles.listRow}>
               <View style={styles.listMain}>
                 <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
-                  {transferKindLabels[item.kind]}
+                  {dataTransferKindLabels[item.kind]}
                 </Text>
                 <Text style={[styles.rowMeta, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
                   {formatDateTime(item.createdAt)} • {item.fileName} • {item.status}
@@ -285,22 +277,19 @@ export function ImportExportScreen() {
           />
         )}
       </Card>
+
       <Card>
         <SectionHeader title="Lịch sử thi gần nhất" subtitle="Giúp admin rà soát dữ liệu kết quả đang lưu trên thiết bị" />
         {overview?.recentHistory.length ? (
           overview.recentHistory.map((entry) => (
             <View key={entry.id} style={styles.listRow}>
               <View style={styles.listMain}>
-                <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
-                  {entry.title}
-                </Text>
+                <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>{entry.title}</Text>
                 <Text style={[styles.rowMeta, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
                   {getExamCatalogModeLabel(entry.catalogMode)} • {getExperienceModeLabel(entry.experienceMode)} • {formatDateTime(entry.completedAt)}
                 </Text>
               </View>
-              <Text style={[styles.score, { color: theme.colors.primary, fontFamily: theme.typography.heading }]}>
-                {entry.scorePercentage}%
-              </Text>
+              <Text style={[styles.score, { color: theme.colors.primary, fontFamily: theme.typography.heading }]}>{entry.scorePercentage}%</Text>
             </View>
           ))
         ) : (

@@ -1,18 +1,23 @@
-import * as DocumentPicker from 'expo-document-picker';
+﻿import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
 import { APP_DISCLAIMER, APP_NAME } from '../constants/app';
+import { dataTransferKindLabels } from '../constants/dataTransfer';
 import { snapshotSchema } from '../types/schemas';
 import type {
   AppSnapshot,
   DataTransferRecord,
   ExamHistoryEntry,
+  ExamReviewItem,
   LearnerProfile,
   LearningCatalog,
+  OptionId,
 } from '../types/models';
+import { formatDurationSeconds, getDifficultyLabel, getExamCatalogModeLabel, getExperienceModeLabel } from '../utils/format';
+import { buildExamResultDetail, buildReviewQuestions } from './examService';
 
 function buildDateToken() {
   return new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -28,6 +33,19 @@ function buildCsvFileName(prefix: string) {
 
 function buildPdfFileName(prefix: string) {
   return `tendergo-${prefix}-${buildDateToken()}.pdf`;
+}
+
+function buildSafeFileSegment(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\u0111/g, 'd')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 32) || 'report'
+  );
 }
 
 async function exportTextFile(payload: string, fileName: string, mimeType: string) {
@@ -58,6 +76,30 @@ async function exportTextFile(payload: string, fileName: string, mimeType: strin
   return fileUri;
 }
 
+async function exportPdfFile(html: string, fileName: string) {
+  if (Platform.OS === 'web') {
+    await Print.printAsync({ html });
+    return fileName;
+  }
+
+  const printResult = await Print.printToFileAsync({ html });
+  let targetUri = printResult.uri;
+
+  if (FileSystem.documentDirectory) {
+    targetUri = `${FileSystem.documentDirectory}${fileName}`;
+    await FileSystem.deleteAsync(targetUri, { idempotent: true }).catch(() => undefined);
+    await FileSystem.copyAsync({ from: printResult.uri, to: targetUri }).catch(() => {
+      targetUri = printResult.uri;
+    });
+  }
+
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(targetUri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
+  }
+
+  return targetUri;
+}
+
 function escapeCsvValue(value: string | number | boolean | null | undefined) {
   const text = String(value ?? '').replace(/"/g, '""');
   return `"${text}"`;
@@ -76,6 +118,19 @@ function escapeHtml(value: string | number | boolean | null | undefined) {
     .replace(/'/g, '&#39;');
 }
 
+function toHtmlText(value: string | number | boolean | null | undefined) {
+  return escapeHtml(value).replace(/\r?\n/g, '<br />');
+}
+
+function compactText(value: string, maxLength: number) {
+  const cleaned = value.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLength) {
+    return cleaned;
+  }
+
+  return `${cleaned.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
 const reportDateFormatter = new Intl.DateTimeFormat('vi-VN', {
   day: '2-digit',
   month: '2-digit',
@@ -85,7 +140,464 @@ const reportDateFormatter = new Intl.DateTimeFormat('vi-VN', {
 });
 
 function formatReportDate(value: string) {
-  return reportDateFormatter.format(new Date(value));
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : reportDateFormatter.format(parsed);
+}
+
+interface ReportMetric {
+  label: string;
+  value: string;
+  helper?: string;
+}
+
+interface PdfDocumentParams {
+  documentCode: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  generatedAt: string;
+  heroMetrics: ReportMetric[];
+  bodyHtml: string;
+  footerTitle?: string;
+  footerNote?: string;
+}
+
+function renderMetricCards(metrics: ReportMetric[]) {
+  return metrics
+    .map(
+      (metric) => `
+        <div class="metric-card">
+          <span class="metric-label">${escapeHtml(metric.label)}</span>
+          <strong>${escapeHtml(metric.value)}</strong>
+          ${metric.helper ? `<span class="metric-helper">${escapeHtml(metric.helper)}</span>` : ''}
+        </div>`,
+    )
+    .join('');
+}
+
+function renderDefinitionGrid(entries: Array<{ label: string; value: string }>) {
+  return `
+    <div class="definition-grid">
+      ${entries
+        .map(
+          (entry) => `
+            <div class="definition-item">
+              <span class="definition-label">${escapeHtml(entry.label)}</span>
+              <strong>${toHtmlText(entry.value)}</strong>
+            </div>`,
+        )
+        .join('')}
+    </div>`;
+}
+
+function renderChipList(values: string[], emptyLabel: string) {
+  if (!values.length) {
+    return `<p class="empty-copy">${escapeHtml(emptyLabel)}</p>`;
+  }
+
+  return `
+    <div class="chip-list">
+      ${values.map((value) => `<span class="chip">${escapeHtml(value)}</span>`).join('')}
+    </div>`;
+}
+
+function buildStatusPill(label: string, tone: 'default' | 'success' | 'warning' | 'danger' = 'default') {
+  return `<span class="status-pill ${tone}">${escapeHtml(label)}</span>`;
+}
+
+function buildPdfDocument({
+  documentCode,
+  eyebrow,
+  title,
+  subtitle,
+  generatedAt,
+  heroMetrics,
+  bodyHtml,
+  footerTitle = 'Lưu ý nghiệp vụ',
+  footerNote = APP_DISCLAIMER,
+}: PdfDocumentParams) {
+  return `<!DOCTYPE html>
+  <html lang="vi">
+    <head>
+      <meta charset="utf-8" />
+      <title>${escapeHtml(APP_NAME)} - ${escapeHtml(title)}</title>
+      <style>
+        @page { margin: 18mm 12mm 18mm; }
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          padding: 0;
+          background: #eef3f8;
+          color: #17324d;
+          font-family: "Segoe UI", Arial, sans-serif;
+        }
+        .sheet {
+          background: #ffffff;
+          border: 1px solid #dbe4ee;
+          border-radius: 28px;
+          padding: 30px;
+        }
+        .masthead {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          align-items: flex-start;
+          margin-bottom: 20px;
+        }
+        .brand {
+          display: flex;
+          gap: 14px;
+          align-items: center;
+        }
+        .brand-mark {
+          width: 56px;
+          height: 56px;
+          border-radius: 18px;
+          background: linear-gradient(135deg, #0f2740 0%, #1f5f8f 100%);
+          color: #ffffff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          box-shadow: 0 12px 30px rgba(15, 39, 64, 0.16);
+        }
+        .brand-copy span,
+        .document-code,
+        .eyebrow,
+        .section-eyebrow,
+        .definition-label,
+        .metric-label,
+        .metric-helper {
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .brand-copy span {
+          display: block;
+          color: #60758d;
+          font-size: 11px;
+          margin-bottom: 4px;
+        }
+        .brand-copy strong {
+          display: block;
+          font-size: 18px;
+          color: #0f2740;
+        }
+        .brand-copy p {
+          margin: 6px 0 0;
+          color: #5e7288;
+          font-size: 12px;
+          line-height: 1.6;
+        }
+        .document-code {
+          border: 1px solid #c8d6e5;
+          border-radius: 999px;
+          padding: 8px 14px;
+          color: #244667;
+          background: #f8fbff;
+          font-size: 11px;
+          white-space: nowrap;
+        }
+        .hero {
+          background: linear-gradient(135deg, #0f2740 0%, #1b5d8e 58%, #4e8dc0 100%);
+          color: #ffffff;
+          border-radius: 24px;
+          padding: 26px;
+          margin-bottom: 18px;
+          box-shadow: 0 22px 44px rgba(15, 39, 64, 0.2);
+        }
+        .eyebrow {
+          color: #c0def7;
+          font-size: 11px;
+          margin-bottom: 10px;
+        }
+        h1, h2, h3 {
+          margin: 0;
+          font-family: Georgia, "Times New Roman", serif;
+          color: inherit;
+        }
+        h1 {
+          font-size: 31px;
+          line-height: 1.18;
+          margin-bottom: 10px;
+        }
+        h2 {
+          font-size: 20px;
+          color: #0f2740;
+          margin-bottom: 8px;
+        }
+        h3 {
+          font-size: 15px;
+          color: #0f2740;
+          margin-bottom: 8px;
+        }
+        .hero p,
+        .body-copy,
+        .empty-copy,
+        .section-card p,
+        td,
+        th,
+        li,
+        .footer p {
+          font-size: 12px;
+          line-height: 1.7;
+        }
+        .hero p {
+          margin: 0;
+          color: #ebf4fb;
+        }
+        .meta-inline {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px 16px;
+          margin-top: 12px;
+          color: #cce4f8;
+          font-size: 11px;
+        }
+        .metric-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+          margin: 18px 0 22px;
+        }
+        .metric-card {
+          border: 1px solid #dbe4ee;
+          border-radius: 18px;
+          padding: 16px 14px;
+          background: linear-gradient(180deg, #fbfdff 0%, #f4f8fc 100%);
+          min-height: 96px;
+        }
+        .metric-card strong {
+          display: block;
+          color: #0f2740;
+          font-size: 24px;
+          margin: 6px 0;
+        }
+        .metric-label {
+          color: #67809a;
+          font-size: 10px;
+        }
+        .metric-helper {
+          display: block;
+          color: #7b8ea4;
+          font-size: 10px;
+          margin-top: 4px;
+          line-height: 1.5;
+        }
+        .section-card {
+          border: 1px solid #dbe4ee;
+          border-radius: 22px;
+          padding: 20px;
+          margin-bottom: 16px;
+          background: #ffffff;
+          page-break-inside: avoid;
+        }
+        .section-eyebrow {
+          display: block;
+          color: #6c8298;
+          font-size: 10px;
+          margin-bottom: 8px;
+        }
+        .definition-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .definition-item {
+          border-radius: 16px;
+          background: #f7fafe;
+          border: 1px solid #dde7f0;
+          padding: 12px 14px;
+        }
+        .definition-item strong {
+          display: block;
+          margin-top: 6px;
+          color: #1e3956;
+          font-size: 13px;
+          line-height: 1.7;
+        }
+        .definition-label {
+          color: #67809a;
+          font-size: 10px;
+        }
+        .note-box {
+          border-radius: 18px;
+          padding: 14px 16px;
+          background: linear-gradient(180deg, #f8fbff 0%, #eef5fb 100%);
+          border: 1px solid #d5e2ee;
+          margin-top: 12px;
+        }
+        .note-box p { margin: 0; }
+        .chip-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 12px;
+        }
+        .chip {
+          display: inline-flex;
+          align-items: center;
+          border-radius: 999px;
+          padding: 6px 11px;
+          background: #edf4fb;
+          border: 1px solid #d5e2ee;
+          color: #274663;
+          font-size: 11px;
+          line-height: 1.3;
+        }
+        .table-shell {
+          border: 1px solid #dbe4ee;
+          border-radius: 18px;
+          overflow: hidden;
+          margin-top: 12px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 10px 12px;
+          vertical-align: top;
+          border-bottom: 1px solid #e4ebf2;
+          text-align: left;
+        }
+        th {
+          background: #f4f8fc;
+          color: #1b3958;
+          font-size: 11px;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          border-radius: 999px;
+          padding: 4px 10px;
+          font-size: 11px;
+          line-height: 1.2;
+          border: 1px solid #d0dbe7;
+          background: #f4f8fc;
+          color: #284664;
+        }
+        .status-pill.success {
+          background: #edf8f1;
+          border-color: #cbe9d2;
+          color: #1b6b3a;
+        }
+        .status-pill.warning {
+          background: #fff6e8;
+          border-color: #f0dec0;
+          color: #8c5d12;
+        }
+        .status-pill.danger {
+          background: #fff0ef;
+          border-color: #f0d0cc;
+          color: #97312a;
+        }
+        .question-detail {
+          border-top: 1px dashed #ccd8e3;
+          padding-top: 16px;
+          margin-top: 16px;
+          page-break-inside: avoid;
+        }
+        .question-meta {
+          color: #62788f;
+          font-size: 11px;
+          margin: 6px 0 10px;
+        }
+        .question-stem {
+          margin: 0 0 10px;
+          color: #1a324b;
+        }
+        .option-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 8px;
+        }
+        .option-item {
+          display: flex;
+          gap: 10px;
+          padding: 10px 12px;
+          border-radius: 14px;
+          border: 1px solid #dbe4ee;
+          background: #fafcff;
+        }
+        .option-item.correct {
+          border-color: #b5dec0;
+          background: #edf8f1;
+        }
+        .option-item.missed {
+          border-color: #e8c3be;
+          background: #fff3f1;
+        }
+        .option-item.selected {
+          box-shadow: inset 0 0 0 1px #7ca4cb;
+        }
+        .option-code {
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: #dbe7f2;
+          color: #15324d;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 700;
+          flex: 0 0 22px;
+          margin-top: 1px;
+        }
+        .footer {
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px dashed #cbd8e4;
+          color: #62788f;
+        }
+        .footer strong { color: #16324d; }
+        @media print {
+          body { background: #ffffff; }
+          .sheet {
+            border: none;
+            border-radius: 0;
+            padding: 0;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="sheet">
+        <div class="masthead">
+          <div class="brand">
+            <div class="brand-mark">TG</div>
+            <div class="brand-copy">
+              <span>${escapeHtml(APP_NAME)}</span>
+              <strong>Bo ho so on tap va danh gia</strong>
+              <p>Ban in phuc vu van hanh noi bo, doi chieu noi dung va tong hop ket qua hoc tap.</p>
+            </div>
+          </div>
+          <div class="document-code">${escapeHtml(documentCode)}</div>
+        </div>
+        <div class="hero">
+          <div class="eyebrow">${escapeHtml(eyebrow)}</div>
+          <h1>${escapeHtml(title)}</h1>
+          <p>${escapeHtml(subtitle)}</p>
+          <div class="meta-inline">
+            <span>Ngay lap: ${escapeHtml(formatReportDate(generatedAt))}</span>
+            <span>Nen tang: ${escapeHtml(APP_NAME)}</span>
+            <span>Che do du lieu: offline ready</span>
+          </div>
+        </div>
+        <div class="metric-grid">${renderMetricCards(heroMetrics)}</div>
+        ${bodyHtml}
+        <div class="footer">
+          <p><strong>${escapeHtml(footerTitle)}:</strong> ${escapeHtml(footerNote)}</p>
+        </div>
+      </div>
+    </body>
+  </html>`;
 }
 
 export function buildQuestionBankCsv(catalog: LearningCatalog) {
@@ -213,12 +725,60 @@ interface BuildAdminReportParams {
   transferHistory: DataTransferRecord[];
 }
 
+interface BuildExamResultReportParams {
+  profile: LearnerProfile;
+  catalog: LearningCatalog;
+  historyEntry: ExamHistoryEntry;
+  reviewItems: ExamReviewItem[];
+}
+
+function buildTopicPerformanceSummary(catalog: LearningCatalog, history: ExamHistoryEntry[]) {
+  const aggregate = new Map<string, { correct: number; total: number }>();
+
+  history.forEach((entry) => {
+    entry.topicBreakdown.forEach((item) => {
+      const previous = aggregate.get(item.topicId) ?? { correct: 0, total: 0 };
+      aggregate.set(item.topicId, {
+        correct: previous.correct + item.correct,
+        total: previous.total + item.total,
+      });
+    });
+  });
+
+  const items = Array.from(aggregate.entries())
+    .map(([topicId, stats]) => {
+      const topic = catalog.topics.find((candidate) => candidate.id === topicId);
+      return {
+        topicId,
+        topicCode: topic?.code ?? topicId,
+        topicName: topic?.name ?? topicId,
+        correct: stats.correct,
+        total: stats.total,
+        accuracy: stats.total ? Math.round((stats.correct / stats.total) * 100) : 0,
+      };
+    })
+    .filter((item) => item.total > 0);
+
+  if (!items.length) {
+    return { strongest: null, weakest: null };
+  }
+
+  const weakest = [...items].sort((left, right) => left.accuracy - right.accuracy || right.total - left.total)[0] ?? null;
+  const strongest = [...items].sort((left, right) => right.accuracy - left.accuracy || right.total - left.total)[0] ?? null;
+
+  return { strongest, weakest };
+}
+
 function buildAdminReportHtml({ profile, catalog, history, transferHistory }: BuildAdminReportParams) {
   const sourceTopics = catalog.topics.filter((topic) => topic.sourceDocument);
   const sourceExams = catalog.exams.filter((exam) => exam.sourceFile);
-  const importedFiles = sourceTopics
-    .map((topic) => topic.sourceDocument?.fileName)
-    .filter((value): value is string => Boolean(value));
+  const importedFiles = Array.from(
+    new Set(
+      sourceTopics
+        .map((topic) => topic.sourceDocument?.fileName)
+        .filter((value): value is string => Boolean(value)),
+    ),
+  );
   const recentHistory = history.slice(0, 8);
   const recentTransfers = transferHistory.slice(0, 8);
   const topicQuestionCountMap = new Map(
@@ -227,6 +787,13 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
       catalog.questions.filter((question) => question.topicId === topic.id).length,
     ]),
   );
+  const averageScore = history.length
+    ? Math.round(history.reduce((total, entry) => total + entry.scorePercentage, 0) / history.length)
+    : null;
+  const passRateAt75 = history.length
+    ? Math.round((history.filter((entry) => entry.scorePercentage >= 75).length / history.length) * 100)
+    : null;
+  const topicPerformance = buildTopicPerformanceSummary(catalog, history);
   const generatedAt = new Date().toISOString();
 
   const sourceTopicRows = sourceTopics
@@ -251,6 +818,7 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
           <td>${escapeHtml(exam.sourceFile ?? '')}</td>
           <td>${escapeHtml(exam.numberOfQuestions)}</td>
           <td>${escapeHtml(exam.durationMinutes)} phút</td>
+          <td>${escapeHtml(exam.sourceLabel ?? 'Đề nguồn nghiệp vụ')}</td>
         </tr>`,
     )
     .join('');
@@ -260,8 +828,8 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
       (entry) => `
         <tr>
           <td>${escapeHtml(entry.title)}</td>
-          <td>${escapeHtml(entry.catalogMode)}</td>
-          <td>${escapeHtml(entry.experienceMode)}</td>
+          <td>${escapeHtml(getExamCatalogModeLabel(entry.catalogMode))}</td>
+          <td>${escapeHtml(getExperienceModeLabel(entry.experienceMode))}</td>
           <td>${escapeHtml(entry.scorePercentage)}%</td>
           <td>${escapeHtml(entry.correctCount)}/${escapeHtml(entry.totalQuestions)}</td>
           <td>${escapeHtml(formatReportDate(entry.completedAt))}</td>
@@ -270,133 +838,81 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
     .join('');
 
   const transferRows = recentTransfers
-    .map(
-      (record) => `
+    .map((record) => {
+      const tone =
+        record.status === 'success' ? 'success' : record.status === 'canceled' ? 'warning' : 'danger';
+
+      return `
         <tr>
-          <td>${escapeHtml(record.kind)}</td>
-          <td>${escapeHtml(record.status)}</td>
+          <td>${escapeHtml(dataTransferKindLabels[record.kind])}</td>
+          <td>${buildStatusPill(record.status, tone)}</td>
           <td>${escapeHtml(record.fileName)}</td>
           <td>${escapeHtml(formatReportDate(record.createdAt))}</td>
-          <td>${escapeHtml(record.note ?? '')}</td>
-        </tr>`,
-    )
+          <td>${escapeHtml(compactText(record.note ?? '', 120))}</td>
+        </tr>`;
+    })
     .join('');
 
-  const importedFileItems = importedFiles
-    .map((fileName) => `<li>${escapeHtml(fileName)}</li>`)
-    .join('');
+  const executiveSummary = [
+    `Hệ thống hiện có ${sourceTopics.length} chuyên đề gắn file nguồn, ${catalog.lessons.length} bài học và ${catalog.questions.length} câu hỏi sẵn sàng cho chế độ offline.`,
+    averageScore === null
+      ? 'Chưa có lịch sử thi đủ để kết luận xu hướng kết quả học tập.'
+      : `Điểm trung bình hiện tại đạt ${averageScore}%, tỷ lệ bài chạm mốc 75% là ${passRateAt75}%.`,
+    topicPerformance.weakest
+      ? `Chuyên đề cần ưu tiên ôn lại là ${topicPerformance.weakest.topicCode} - ${topicPerformance.weakest.topicName} với độ chính xác khoảng ${topicPerformance.weakest.accuracy}%.`
+      : 'Chưa đủ dữ liệu để xác định chuyên đề yếu nhất.',
+  ];
 
-  return `<!DOCTYPE html>
-  <html lang="vi">
-    <head>
-      <meta charset="utf-8" />
-      <title>${escapeHtml(APP_NAME)} - Bao cao du lieu</title>
-      <style>
-        body {
-          font-family: "Segoe UI", Arial, sans-serif;
-          color: #243447;
-          margin: 0;
-          padding: 32px;
-          background: #f4f7fb;
-        }
-        .page {
-          background: #ffffff;
-          border: 1px solid #d9e2ec;
-          border-radius: 20px;
-          padding: 28px 32px;
-        }
-        .hero {
-          background: linear-gradient(135deg, #0f2740 0%, #1b5d8e 100%);
-          color: white;
-          border-radius: 18px;
-          padding: 24px;
-          margin-bottom: 24px;
-        }
-        h1, h2 {
-          margin: 0 0 8px 0;
-          font-family: Georgia, "Times New Roman", serif;
-        }
-        h1 { font-size: 30px; }
-        h2 { font-size: 20px; margin-top: 26px; }
-        p, li, td, th { font-size: 12px; line-height: 1.55; }
-        .muted { color: #6b7b8f; }
-        .meta-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 18px;
-        }
-        .metric {
-          border: 1px solid #d9e2ec;
-          border-radius: 14px;
-          padding: 14px;
-          background: #f8fbff;
-        }
-        .metric strong {
-          display: block;
-          font-size: 22px;
-          color: #0f2740;
-          margin-top: 6px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 12px;
-        }
-        th, td {
-          border: 1px solid #d9e2ec;
-          padding: 8px 10px;
-          vertical-align: top;
-        }
-        th {
-          background: #eef4fb;
-          text-align: left;
-          color: #0f2740;
-        }
-        .section {
-          margin-top: 20px;
-        }
-        ul {
-          margin: 10px 0 0 18px;
-          padding: 0;
-        }
-        .footer {
-          margin-top: 24px;
-          padding-top: 14px;
-          border-top: 1px dashed #c6d3e1;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="page">
-        <div class="hero">
-          <h1>Báo cáo dữ liệu và ôn tập</h1>
-          <p>${escapeHtml(catalog.program.name)}</p>
-          <p class="muted">Sinh lúc ${escapeHtml(formatReportDate(generatedAt))} cho hồ sơ ${escapeHtml(profile.displayName)}.</p>
+  return buildPdfDocument({
+    documentCode: 'ADMIN REPORT',
+    eyebrow: 'Báo cáo vận hành nội dung',
+    title: 'Báo cáo dữ liệu và ôn tập',
+    subtitle: `${catalog.program.name}. Tài liệu tổng hợp dành cho quản trị nội dung, đối chiếu seed và theo dõi kết quả học tập.`,
+    generatedAt,
+    heroMetrics: [
+      { label: 'Chuyên đề nguồn', value: `${sourceTopics.length}`, helper: 'Đã gắn tệp nguồn' },
+      { label: 'Bài học', value: `${catalog.lessons.length}`, helper: 'Sẵn sàng offline' },
+      { label: 'Câu hỏi', value: `${catalog.questions.length}`, helper: 'Ngân hàng hiện có' },
+      { label: 'Điểm trung bình', value: averageScore === null ? '--' : `${averageScore}%`, helper: 'Theo lịch sử thi' },
+    ],
+    bodyHtml: `
+      <section class="section-card">
+        <span class="section-eyebrow">Tóm tắt điều hành</span>
+        <h2>Trạng thái nội dung và học tập</h2>
+        ${executiveSummary.map((paragraph) => `<p class="body-copy">${escapeHtml(paragraph)}</p>`).join('')}
+        <div class="note-box">
+          <p>
+            <strong>Gợi ý nhanh:</strong>
+            ${
+              topicPerformance.strongest
+                ? ` Kết quả tốt nhất hiện nay nghiêng về ${escapeHtml(topicPerformance.strongest.topicCode)} - ${escapeHtml(
+                    topicPerformance.strongest.topicName,
+                  )} (${escapeHtml(topicPerformance.strongest.accuracy)}%).`
+                : ' Chưa có dữ liệu để xác định chuyên đề mạnh nhất.'
+            }
+          </p>
         </div>
+      </section>
 
-        <div class="meta-grid">
-          <div class="metric">Chuyên đề nguồn<strong>${escapeHtml(sourceTopics.length)}</strong></div>
-          <div class="metric">Bài học<strong>${escapeHtml(catalog.lessons.length)}</strong></div>
-          <div class="metric">Câu hỏi<strong>${escapeHtml(catalog.questions.length)}</strong></div>
-          <div class="metric">Lịch sử thi<strong>${escapeHtml(history.length)}</strong></div>
-        </div>
+      <section class="section-card">
+        <span class="section-eyebrow">Hồ sơ người học</span>
+        <h2>Thông tin tổng quan</h2>
+        ${renderDefinitionGrid([
+          { label: 'Người dùng', value: profile.displayName },
+          { label: 'Vai trò', value: profile.roleLabel },
+          { label: 'Mục tiêu', value: profile.learningGoal },
+          { label: 'Study target', value: `${profile.dailyStudyMinutes} phút/ngày` },
+          { label: 'Streak', value: `${profile.streakDays} ngày` },
+          { label: 'Ngày tham gia', value: formatReportDate(profile.joinedAt) },
+        ])}
+      </section>
 
-        <div class="section">
-          <h2>Hồ sơ học viên</h2>
-          <p><strong>Người dùng:</strong> ${escapeHtml(profile.displayName)}</p>
-          <p><strong>Vai trò:</strong> ${escapeHtml(profile.roleLabel)}</p>
-          <p><strong>Mục tiêu:</strong> ${escapeHtml(profile.learningGoal)}</p>
-          <p><strong>Streak:</strong> ${escapeHtml(profile.streakDays)} ngày</p>
-        </div>
-
-        <div class="section">
-          <h2>File nguồn đã nhập</h2>
-          ${importedFiles.length ? `<ul>${importedFileItems}</ul>` : '<p>Chưa có file nguồn được ghi nhận.</p>'}
-        </div>
-
-        <div class="section">
-          <h2>Danh mục chuyên đề nguồn</h2>
+      <section class="section-card">
+        <span class="section-eyebrow">Nguồn tài liệu</span>
+        <h2>Danh mục file và chuyên đề đã nạp</h2>
+        <p class="body-copy">Danh sách dưới đây giúp đối chiếu nhanh giữa data seed trong app và tài liệu nghiệp vụ gốc.</p>
+        ${renderChipList(importedFiles, 'Chưa ghi nhận file nguồn nào.')}
+        <div class="table-shell">
           <table>
             <thead>
               <tr>
@@ -413,9 +929,12 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
             </tbody>
           </table>
         </div>
+      </section>
 
-        <div class="section">
-          <h2>Đề thi nguồn</h2>
+      <section class="section-card">
+        <span class="section-eyebrow">Đề thi và kết quả</span>
+        <h2>Bộ đề nguồn và lịch sử thi gần đây</h2>
+        <div class="table-shell">
           <table>
             <thead>
               <tr>
@@ -423,16 +942,15 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
                 <th>File nguồn</th>
                 <th>Số câu</th>
                 <th>Thời gian</th>
+                <th>Nhãn</th>
               </tr>
             </thead>
             <tbody>
-              ${sourceExamRows || '<tr><td colspan="4">Chưa có dữ liệu.</td></tr>'}
+              ${sourceExamRows || '<tr><td colspan="5">Chưa có đề thi nguồn.</td></tr>'}
             </tbody>
           </table>
         </div>
-
-        <div class="section">
-          <h2>Lịch sử thi gần nhất</h2>
+        <div class="table-shell">
           <table>
             <thead>
               <tr>
@@ -449,9 +967,13 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
             </tbody>
           </table>
         </div>
+      </section>
 
-        <div class="section">
-          <h2>Lịch sử thao tác dữ liệu</h2>
+      <section class="section-card">
+        <span class="section-eyebrow">Audit trail</span>
+        <h2>Lịch sử thao tác dữ liệu</h2>
+        <p class="body-copy">Giữ dấu vết import/export để phục vụ kiểm tra nội bộ và truy vết thao tác gần nhất.</p>
+        <div class="table-shell">
           <table>
             <thead>
               <tr>
@@ -467,13 +989,206 @@ function buildAdminReportHtml({ profile, catalog, history, transferHistory }: Bu
             </tbody>
           </table>
         </div>
+      </section>`,
+  });
+}
+function buildExamResultHtml({ profile, catalog, historyEntry, reviewItems }: BuildExamResultReportParams) {
+  const examDefinition = catalog.exams.find((exam) => exam.id === historyEntry.examId);
+  const passingScore = examDefinition?.passingScore ?? 75;
+  const passed = historyEntry.scorePercentage >= passingScore;
+  const breakdown = buildExamResultDetail(catalog, historyEntry);
+  const reviewQuestions = buildReviewQuestions(catalog, reviewItems);
+  const topicMap = new Map(catalog.topics.map((topic) => [topic.id, topic]));
+  const answeredCount = reviewItems.filter((item) => item.selectedAnswer !== null).length;
+  const incorrectCount = historyEntry.totalQuestions - historyEntry.correctCount;
+  const generatedAt = new Date().toISOString();
 
-        <div class="footer">
-          <p><strong>Lưu ý nghiệp vụ:</strong> ${escapeHtml(APP_DISCLAIMER)}</p>
+  const breakdownRows = breakdown
+    .map(
+      (item) => `
+        <tr>
+          <td>${escapeHtml(item.topicCode)}</td>
+          <td>${escapeHtml(item.topicName)}</td>
+          <td>${escapeHtml(item.correct)}/${escapeHtml(item.total)}</td>
+          <td>${item.total ? escapeHtml(Math.round((item.correct / item.total) * 100)) : 0}%</td>
+        </tr>`,
+    )
+    .join('');
+
+  const reviewSummaryRows = reviewQuestions
+    .map(({ question, reviewItem }, index) => {
+      const topic = topicMap.get(question.topicId);
+      const resultLabel = reviewItem.isCorrect ? 'Đúng' : reviewItem.selectedAnswer ? 'Sai' : 'Bỏ trống';
+      const tone = reviewItem.isCorrect ? 'success' : reviewItem.selectedAnswer ? 'danger' : 'warning';
+
+      return `
+        <tr>
+          <td>${escapeHtml(index + 1)}</td>
+          <td>${escapeHtml(topic?.code ?? question.topicId)}</td>
+          <td>${escapeHtml(compactText(question.question, 110))}</td>
+          <td>${escapeHtml(reviewItem.selectedAnswer ?? '--')}</td>
+          <td>${escapeHtml(reviewItem.correctAnswer)}</td>
+          <td>${buildStatusPill(resultLabel, tone)}</td>
+        </tr>`;
+    })
+    .join('');
+
+  const itemsNeedingReview = reviewQuestions
+    .map((item, index) => ({ ...item, index }))
+    .filter(({ reviewItem }) => !reviewItem.isCorrect || reviewItem.selectedAnswer === null);
+
+  const detailedReviewSections = itemsNeedingReview
+    .map(({ question, reviewItem, index }) => {
+      const topic = topicMap.get(question.topicId);
+      const optionMap = new Map(question.options.map((option) => [option.id, option]));
+      const orderedOptions =
+        reviewItem.optionOrder.length > 0 ? reviewItem.optionOrder : question.options.map((option) => option.id);
+
+      const optionItems = orderedOptions
+        .map((optionId) => {
+          const option = optionMap.get(optionId as OptionId);
+          if (!option) {
+            return '';
+          }
+
+          const classes = ['option-item'];
+          if (optionId === reviewItem.correctAnswer) {
+            classes.push('correct');
+          }
+          if (optionId === reviewItem.selectedAnswer) {
+            classes.push(reviewItem.isCorrect ? 'selected' : 'missed');
+          }
+
+          return `
+            <li class="${classes.join(' ')}">
+              <span class="option-code">${escapeHtml(option.id)}</span>
+              <span>${toHtmlText(option.label)}</span>
+            </li>`;
+        })
+        .join('');
+
+      return `
+        <div class="question-detail">
+          <h3>Câu ${escapeHtml(index + 1)} - cần ôn lại</h3>
+          <p class="question-meta">
+            ${escapeHtml(topic?.code ?? question.topicId)} • ${escapeHtml(getDifficultyLabel(question.difficulty))} • ${escapeHtml(question.source)}
+          </p>
+          <p class="question-stem">${toHtmlText(question.question)}</p>
+          <ul class="option-list">${optionItems}</ul>
+          <div class="note-box">
+            <p><strong>Giải thích:</strong> ${toHtmlText(question.explanation)}</p>
+          </div>
+        </div>`;
+    })
+    .join('');
+
+  const summaryMessage = passed
+    ? `Học viên đã vượt mốc đạt ${passingScore}% với kết quả ${historyEntry.scorePercentage}%. Có thể chuyển sang vòng luyện đề tổng hợp hoặc mô phỏng thi.`
+    : `Kết quả hiện tại là ${historyEntry.scorePercentage}%, thấp hơn mốc đạt ${passingScore}%. Nên ưu tiên rà lại các chuyên đề yếu và các câu sai ở phần cuối báo cáo.`;
+
+  return buildPdfDocument({
+    documentCode: 'EXAM RESULT',
+    eyebrow: 'Hồ sơ kết quả bài thi',
+    title: historyEntry.title,
+    subtitle: `Phiếu tổng hợp dành cho học viên ${profile.displayName}, ghi nhận kết quả và các điểm cần ôn lại sau bài làm.`,
+    generatedAt,
+    heroMetrics: [
+      { label: 'Điểm số', value: `${historyEntry.scorePercentage}%`, helper: passed ? 'Vượt mốc đạt' : 'Cần ôn thêm' },
+      { label: 'Câu đúng', value: `${historyEntry.correctCount}/${historyEntry.totalQuestions}`, helper: `${incorrectCount} câu cần xử lý` },
+      { label: 'Đã trả lời', value: `${answeredCount}/${historyEntry.totalQuestions}`, helper: `${historyEntry.flaggedCount} câu đã đánh dấu` },
+      { label: 'Thời gian', value: formatDurationSeconds(historyEntry.durationSeconds), helper: getExperienceModeLabel(historyEntry.experienceMode) },
+    ],
+    bodyHtml: `
+      <section class="section-card">
+        <span class="section-eyebrow">Kết luận nhanh</span>
+        <h2>Đánh giá sau bài thi</h2>
+        <p class="body-copy">${escapeHtml(summaryMessage)}</p>
+        <div class="note-box">
+          <p><strong>Khuyến nghị:</strong> ${
+            historyEntry.weakTopicIds.length
+              ? `Tập trung ôn lại ${historyEntry.weakTopicIds
+                  .map((topicId) => {
+                    const topic = catalog.topics.find((candidate) => candidate.id === topicId);
+                    return topic ? `${topic.code} - ${topic.name}` : topicId;
+                  })
+                  .join('; ')}.`
+              : 'Kết quả phân bổ khá đồng đều, có thể tăng độ khó hoặc chuyển sang đề tổng hợp.'
+          }</p>
         </div>
-      </div>
-    </body>
-  </html>`;
+      </section>
+
+      <section class="section-card">
+        <span class="section-eyebrow">Thông tin hồ sơ</span>
+        <h2>Học viên và bài thi</h2>
+        ${renderDefinitionGrid([
+          { label: 'Học viên', value: profile.displayName },
+          { label: 'Vai trò', value: profile.roleLabel },
+          { label: 'Loại đề', value: getExamCatalogModeLabel(historyEntry.catalogMode) },
+          { label: 'Chế độ', value: getExperienceModeLabel(historyEntry.experienceMode) },
+          { label: 'Bắt đầu', value: formatReportDate(historyEntry.startedAt) },
+          { label: 'Hoàn thành', value: formatReportDate(historyEntry.completedAt) },
+          { label: 'Mốc đạt', value: `${passingScore}%` },
+          { label: 'Nguồn đề', value: examDefinition?.sourceFile ?? examDefinition?.sourceLabel ?? 'Đề sinh trong hệ thống' },
+        ])}
+      </section>
+
+      <section class="section-card">
+        <span class="section-eyebrow">Breakdown chuyên đề</span>
+        <h2>Tỷ lệ đúng theo chuyên đề</h2>
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Chuyên đề</th>
+                <th>Kết quả</th>
+                <th>Độ chính xác</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${breakdownRows || '<tr><td colspan="4">Không có dữ liệu breakdown.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <span class="section-eyebrow">Tổng hợp đáp án</span>
+        <h2>Bảng review nhanh từng câu</h2>
+        ${
+          reviewSummaryRows
+            ? `
+              <div class="table-shell">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Chuyên đề</th>
+                      <th>Nội dung câu hỏi</th>
+                      <th>Bạn chọn</th>
+                      <th>Đáp án</th>
+                      <th>Kết quả</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${reviewSummaryRows}
+                  </tbody>
+                </table>
+              </div>`
+            : '<p class="empty-copy">Phiên bản dữ liệu này chưa lưu chi tiết đáp án để xuất bảng review.</p>'
+        }
+      </section>
+
+      <section class="section-card">
+        <span class="section-eyebrow">Cần ôn lại</span>
+        <h2>Câu sai và bỏ trống</h2>
+        ${
+          detailedReviewSections
+            ? detailedReviewSections
+            : '<p class="body-copy">Không ghi nhận câu sai hoặc bỏ trống trong bài thi này.</p>'
+        }
+      </section>`,
+  });
 }
 
 export async function exportQuestionBankCsv(catalog: LearningCatalog) {
@@ -489,21 +1204,12 @@ export async function exportTopicCatalogCsv(catalog: LearningCatalog) {
 }
 
 export async function exportAdminReportPdf(params: BuildAdminReportParams) {
-  const fileName = buildPdfFileName('admin-report');
-  const html = buildAdminReportHtml(params);
+  return exportPdfFile(buildAdminReportHtml(params), buildPdfFileName('admin-report'));
+}
 
-  if (Platform.OS === 'web') {
-    await Print.printAsync({ html });
-    return fileName;
-  }
-
-  const printResult = await Print.printToFileAsync({ html });
-
-  if (await Sharing.isAvailableAsync()) {
-    await Sharing.shareAsync(printResult.uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
-  }
-
-  return printResult.uri;
+export async function exportExamResultPdf(params: BuildExamResultReportParams) {
+  const prefix = `exam-result-${buildSafeFileSegment(params.historyEntry.title)}`;
+  return exportPdfFile(buildExamResultHtml(params), buildPdfFileName(prefix));
 }
 
 export async function exportSnapshotFile(snapshot: AppSnapshot) {

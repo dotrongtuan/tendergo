@@ -12,7 +12,8 @@ export type DataTransferKind =
   | 'export_question_bank_csv'
   | 'export_exam_history_csv'
   | 'export_topic_catalog_csv'
-  | 'export_admin_report_pdf';
+  | 'export_admin_report_pdf'
+  | 'export_exam_result_pdf';
 export type DataTransferStatus = 'success' | 'canceled' | 'error';
 
 export interface Program {
