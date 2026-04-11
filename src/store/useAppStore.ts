@@ -68,6 +68,7 @@ interface AppStoreState {
   buildSnapshot: () => AppSnapshot;
   importSnapshot: (snapshot: AppSnapshot) => void;
   recordTransfer: (record: Omit<DataTransferRecord, 'id' | 'createdAt'>) => void;
+  resetLearnerProgress: () => void;
   resetToSeed: () => void;
 }
 
@@ -83,6 +84,33 @@ function buildInitialPersistedState() {
     activeSession: null as ExamSession | null,
     questionBankFilters: { ...DEFAULT_QUESTION_BANK_FILTERS },
     recentSearches: [...seededRecentSearches],
+    transferHistory: [] as DataTransferRecord[],
+  };
+}
+
+function buildFreshLearnerState(
+  profile: LearnerProfile,
+  preferences: typeof mockPreferences,
+) {
+  return {
+    preferences: {
+      ...preferences,
+      hasCompletedOnboarding: true,
+      authMode: preferences.authMode ?? 'guest',
+    },
+    profile: {
+      ...profile,
+      streakDays: 0,
+      joinedAt: new Date().toISOString(),
+    },
+    bookmarks: { lessonIds: [], questionIds: [] },
+    lessonProgress: {} as Record<string, LessonProgress>,
+    questionPerformance: {} as Record<string, QuestionPerformance>,
+    history: [] as typeof mockHistory,
+    reviewMap: {} as Record<string, ExamReviewItem[]>,
+    activeSession: null as ExamSession | null,
+    questionBankFilters: { ...DEFAULT_QUESTION_BANK_FILTERS },
+    recentSearches: [] as string[],
     transferHistory: [] as DataTransferRecord[],
   };
 }
@@ -313,6 +341,10 @@ export const useAppStore = create<AppStoreState>()(
             },
             ...state.transferHistory,
           ].slice(0, 20),
+        })),
+      resetLearnerProgress: () =>
+        set((state) => ({
+          ...buildFreshLearnerState(state.profile, state.preferences),
         })),
       resetToSeed: () =>
         set((state) => ({
