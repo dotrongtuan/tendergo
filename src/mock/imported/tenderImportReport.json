@@ -1,0 +1,121 @@
+{
+  "generatedAt": "2026-04-11T18:53:36.738970+00:00",
+  "sourceDirectory": "D:\\Data\\TUANDT\\ĐẤU THẦU",
+  "topicCount": 9,
+  "examCount": 2,
+  "totals": {
+    "lessons": 98,
+    "topicQuestions": 180,
+    "examQuestions": 40,
+    "totalQuestions": 220,
+    "legalReferences": 255
+  },
+  "topics": [
+    {
+      "topicNumber": 1,
+      "sourceFile": "chuyen_de_1_dau_thau.docx",
+      "documentTitle": "Giới thiệu chung về kỳ thi; Quy định chung trong lựa chọn nhà thầu",
+      "lessonCount": 10,
+      "questionCount": 20,
+      "learningObjectiveCount": 4,
+      "legalReferenceCount": 35,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 2,
+      "sourceFile": "chuyen_de_2_ke_hoach_tong_the_ke_hoach_lcnt.docx",
+      "documentTitle": "KẾ HOẠCH TỔNG THỂ VÀ KẾ HOẠCH LỰA CHỌN NHÀ THẦU",
+      "lessonCount": 7,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 32,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 3,
+      "sourceFile": "chuyen_de_3_quy_trinh_thu_tuc_lua_chon_nha_thau.docx",
+      "documentTitle": "QUY TRÌNH, THỦ TỤC LỰA CHỌN NHÀ THẦU",
+      "lessonCount": 17,
+      "questionCount": 20,
+      "learningObjectiveCount": 4,
+      "legalReferenceCount": 35,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 4,
+      "sourceFile": "chuyen_de_4_mua_sam_tap_trung.docx",
+      "documentTitle": "Bài giảng phục vụ ôn tập kiến thức đấu thầu",
+      "lessonCount": 12,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 13,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 5,
+      "sourceFile": "chuyen_de_5_mua_sam_linh_vuc_y_te.docx",
+      "documentTitle": "MUA SẮM TRONG LĨNH VỰC Y TẾ",
+      "lessonCount": 13,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 30,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 6,
+      "sourceFile": "chuyen_de_6_dau_thau_qua_mang.docx",
+      "documentTitle": "Cập nhật theo khung pháp lý hiện hành đến ngày 09/04/2026",
+      "lessonCount": 6,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 32,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 7,
+      "sourceFile": "chuyen_de_7_hop_dong.docx",
+      "documentTitle": "HỢP ĐỒNG TRONG LỰA CHỌN NHÀ THẦU",
+      "lessonCount": 10,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 18,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 8,
+      "sourceFile": "chuyen_de_8_xu_ly_tinh_huong_trong_dau_thau.docx",
+      "documentTitle": "I. MỤC TIÊU HỌC TẬP",
+      "lessonCount": 16,
+      "questionCount": 20,
+      "learningObjectiveCount": 4,
+      "legalReferenceCount": 35,
+      "flashSummaryCount": 3
+    },
+    {
+      "topicNumber": 10,
+      "sourceFile": "chuyen_de_10_xu_ly_kien_nghi_kiem_tra_giam_sat_trong_dau_thau.docx",
+      "documentTitle": "XỬ LÝ KIẾN NGHỊ, KIỂM TRA, GIÁM SÁT TRONG ĐẤU THẦU",
+      "lessonCount": 7,
+      "questionCount": 20,
+      "learningObjectiveCount": 5,
+      "legalReferenceCount": 25,
+      "flashSummaryCount": 3
+    }
+  ],
+  "exams": [
+    {
+      "id": "general-source-01",
+      "sourceFile": "bai_thi_thu_trac_nghiem_kien_thuc_chung_dau_thau.docx",
+      "title": "BÀI THI THỬ TRẮC NGHIỆM CÁC KIẾN THỨC CHUNG VỀ ĐẤU THẦU",
+      "durationMinutes": 30,
+      "questionCount": 20
+    },
+    {
+      "id": "general-source-02",
+      "sourceFile": "Bài kiểm tra trắc nghiệm chứng chỉ đấu thầu tổng quát.docx",
+      "title": "BÀI THI THỬ TRẮC NGHIỆM KIẾN THỨC CHUNG VỀ ĐẤU THẦU",
+      "durationMinutes": 30,
+      "questionCount": 20
+    }
+  ]
+}

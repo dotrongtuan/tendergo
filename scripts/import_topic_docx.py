@@ -60,6 +60,17 @@ STOP_WORDS = {
     'nha',
 }
 
+LEGAL_REFERENCE_KEYWORDS = (
+    'luat ',
+    'nghi dinh',
+    'thong tu',
+    'quyet dinh',
+    'nghi quyet',
+    'cong van',
+    'sua doi',
+    'bo sung',
+)
+
 
 @dataclass
 class BodyItem:
@@ -102,6 +113,43 @@ def slugify(text: str) -> str:
 def split_sentences(text: str) -> list[str]:
     parts = re.split(r'(?<=[\.\!\?])\s+', text)
     return [part.strip() for part in parts if len(part.strip()) >= 24]
+
+
+def split_reference_candidates(text: str) -> list[str]:
+    parts = re.split(r'(?<=[\.;])\s+|\s+\|\s+', text)
+    return [part.strip(' -') for part in parts if len(part.strip(' -')) >= 12]
+
+
+def looks_like_legal_reference(text: str) -> bool:
+    normalized = normalize_key(text)
+    return any(keyword in normalized for keyword in LEGAL_REFERENCE_KEYWORDS)
+
+
+def extract_legal_references(items: list[BodyItem]) -> list[str]:
+    references: list[str] = []
+    seen: set[str] = set()
+
+    def remember(value: str) -> None:
+        cleaned = clean_text(value)
+        signature = normalize_key(cleaned)
+        if len(cleaned) < 12 or signature in seen or not looks_like_legal_reference(cleaned):
+            return
+        seen.add(signature)
+        references.append(cleaned)
+
+    for item in items:
+        if item.kind == 'paragraph':
+            for candidate in split_reference_candidates(item.text):
+                remember(candidate)
+        elif item.kind == 'table' and item.rows:
+            for row in item.rows[1:] if len(item.rows) > 1 else item.rows:
+                row_values = [clean_text(cell) for cell in row if clean_text(cell)]
+                for value in row_values:
+                    remember(value)
+                if row_values:
+                    remember(' - '.join(row_values[:2]))
+
+    return references
 
 
 def get_style_name(style_id: str | None, style_map: dict[str, str]) -> str:
@@ -693,6 +741,7 @@ def parse_document(path: Path) -> dict[str, Any]:
         if learning_objectives
         else [lesson['title'] for lesson in lessons[:3]]
     )
+    legal_references = list(dict.fromkeys([*legal_references, *extract_legal_references(items)]))
 
     for lesson_index, lesson in enumerate(lessons):
         if examples:

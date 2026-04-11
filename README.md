@@ -6,7 +6,7 @@ TenderGO is a cross-platform learning and exam preparation app for the procureme
 
 The current version is an offline-first MVP built with Expo + React Native + TypeScript, designed to be easy to extend into a production e-learning platform with a real backend, admin tooling, and cloud sync.
 
-Important note: the included lessons and questions are sample demo content only. They must be reviewed by subject matter experts before any official use.
+Important note: the current dataset has been integrated from user-provided topic DOCX files and source mock exam DOCX files. It still must be reviewed by subject matter experts and checked against the latest legal documents before any official use.
 
 ## Release Status
 
@@ -87,14 +87,15 @@ This keeps UI concerns separate from data access and leaves a clean path for fut
 
 ## Seed Data
 
-The demo catalog currently includes:
+The current imported catalog includes:
 
 - 9 topics with preserved numbering: `1, 2, 3, 4, 5, 6, 7, 8, 10`
-- 27 lessons
-- 162 sample questions
-- Topic-based mock exams
-- 1 composite exam
-- Sample bookmarks, learner progress, and exam history
+- 98 lessons imported from topic source documents
+- 220 questions imported from topic/question source documents
+- 9 topic-based mock exams
+- 2 source-based comprehensive exams
+- 1 generated composite exam
+- Source metadata, legal references, learner progress, and exam history seeds
 
 The data model is intentionally flexible so Topic 9 or other future programs can be added later without redesigning the core app.
 
@@ -165,6 +166,24 @@ npm run web
 npm run typecheck
 npm run build:web
 ```
+
+## Content Import Pipeline
+
+The repository includes a repeatable DOCX import pipeline for updating the learning catalog from source materials.
+
+### Import all source data
+
+```bash
+npm run import:dataset -- --input-dir "D:\Data\TUANDT\ĐẤU THẦU"
+```
+
+This command regenerates:
+
+- `src/mock/imported/tenderTrainingData.json`
+- `src/mock/imported/tenderExamSets.json`
+- `src/mock/imported/tenderImportReport.json`
+
+The import report is used in the app's data center screen to show source coverage, generation timestamp, and per-topic lesson/question counts.
 
 ### Clear Metro cache
 

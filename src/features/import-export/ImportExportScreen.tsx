@@ -10,6 +10,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { SectionHeader } from '../../components/SectionHeader';
 import { dataTransferKindLabels } from '../../constants/dataTransfer';
 import { useCatalogQuery } from '../../hooks/useCatalogQueries';
+import importReport from '../../mock/imported/tenderImportReport.json';
 import { useRootNavigation } from '../../navigation/helpers';
 import {
   exportAdminReportPdf,
@@ -22,6 +23,32 @@ import {
 import { useAppStore } from '../../store/useAppStore';
 import { useAppTheme } from '../../theme';
 import { formatDateTime, getExamCatalogModeLabel, getExperienceModeLabel } from '../../utils/format';
+
+type ImportReport = {
+  generatedAt: string;
+  sourceDirectory: string;
+  topicCount: number;
+  examCount: number;
+  totals: {
+    lessons: number;
+    topicQuestions: number;
+    examQuestions: number;
+    totalQuestions: number;
+    legalReferences: number;
+  };
+  topics: Array<{
+    topicNumber: number;
+    sourceFile: string;
+    documentTitle: string;
+    lessonCount: number;
+    questionCount: number;
+    learningObjectiveCount: number;
+    legalReferenceCount: number;
+    flashSummaryCount: number;
+  }>;
+};
+
+const latestImportReport = importReport as ImportReport;
 
 function resolveFileName(location: string, fallback: string) {
   const segments = location.split(/[\\/]/).filter(Boolean);
@@ -107,6 +134,22 @@ export function ImportExportScreen() {
       </View>
 
       <Card>
+        <SectionHeader title="Lần import nghiệp vụ gần nhất" subtitle="Batch import từ tài liệu DOCX nguồn" />
+        <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+          • Thời điểm generate: {formatDateTime(latestImportReport.generatedAt)}
+        </Text>
+        <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+          • Thư mục nguồn: {latestImportReport.sourceDirectory}
+        </Text>
+        <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+          • Phạm vi: {latestImportReport.topicCount} chuyên đề, {latestImportReport.examCount} bộ đề nguồn, {latestImportReport.totals.lessons} bài học, {latestImportReport.totals.totalQuestions} câu hỏi.
+        </Text>
+        <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
+          • Căn cứ pháp lý trích được: {latestImportReport.totals.legalReferences} mục.
+        </Text>
+      </Card>
+
+      <Card>
         <SectionHeader title="Nguồn dữ liệu đang dùng" subtitle="Tổng hợp cho quản trị nội dung" />
         <Text style={[styles.body, { color: theme.colors.text, fontFamily: theme.typography.body }]}>
           • {overview?.sourceTopics.length ?? 0} chuyên đề đã gắn file nguồn trực tiếp.
@@ -127,6 +170,22 @@ export function ImportExportScreen() {
             ))}
           </>
         ) : null}
+      </Card>
+
+      <Card>
+        <SectionHeader title="Độ phủ theo chuyên đề" subtitle="Kiểm tra nhanh số bài học và câu hỏi đã nhập" />
+        {latestImportReport.topics.map((topic) => (
+          <View key={topic.sourceFile} style={styles.listRow}>
+            <View style={styles.listMain}>
+              <Text style={[styles.rowTitle, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
+                CD{topic.topicNumber} • {topic.documentTitle}
+              </Text>
+              <Text style={[styles.rowMeta, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
+                {topic.lessonCount} bài học • {topic.questionCount} câu hỏi • {topic.legalReferenceCount} căn cứ • {topic.sourceFile}
+              </Text>
+            </View>
+          </View>
+        ))}
       </Card>
 
       <Card>
