@@ -15,14 +15,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tendergo.app"
+      "bundleIdentifier": "vn.dotrongtuan.tendergo",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f2740"
       },
-      "package": "com.tendergo.app",
+      "package": "vn.dotrongtuan.tendergo",
+      "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -31,6 +33,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ec5ef325-266d-4b5b-b0f4-fd11073bc7d8"
+      }
+    },
+    "owner": "dotuanbk"
   }
 }
