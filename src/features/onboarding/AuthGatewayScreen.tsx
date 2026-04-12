@@ -6,12 +6,13 @@ import { AppScreen } from '../../components/AppScreen';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { PageHeader } from '../../components/PageHeader';
-import { authFormSchema, type AuthFormValues } from '../../types/schemas';
 import { useAppStore } from '../../store/useAppStore';
+import { authFormSchema, type AuthFormValues } from '../../types/schemas';
 import { useAppTheme } from '../../theme';
 
 export function AuthGatewayScreen() {
   const theme = useAppTheme();
+  const profile = useAppStore((state) => state.profile);
   const startGuestMode = useAppStore((state) => state.startGuestMode);
   const startMockLogin = useAppStore((state) => state.startMockLogin);
   const {
@@ -22,8 +23,9 @@ export function AuthGatewayScreen() {
   } = useForm<AuthFormValues>({
     resolver: zodResolver(authFormSchema),
     defaultValues: {
-      displayName: 'Học viên nội bộ',
-      learningGoal: 'Ôn hết các chuyên đề và luyện đề tổng hợp ít nhất 3 lần mỗi tuần.',
+      displayName: profile.displayName || 'Học viên nội bộ',
+      learningGoal:
+        profile.learningGoal || 'Ôn hết các chuyên đề và luyện đề tổng hợp ít nhất 3 lần mỗi tuần.',
     },
   });
 
@@ -38,27 +40,52 @@ export function AuthGatewayScreen() {
         description="Bạn có thể vào app ngay ở chế độ khách hoặc dùng mock login để lưu tên hiển thị và mục tiêu học tập."
       />
       <Card>
-        <Text style={[styles.label, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>Tên hiển thị</Text>
+        <Text style={[styles.label, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
+          Tên hiển thị
+        </Text>
         <TextInput
           value={displayName}
           onChangeText={(value) => setValue('displayName', value)}
-          style={[styles.input, { color: theme.colors.heading, borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceMuted, fontFamily: theme.typography.body }]}
+          style={[
+            styles.input,
+            {
+              color: theme.colors.heading,
+              borderColor: theme.colors.border,
+              backgroundColor: theme.colors.surfaceMuted,
+              fontFamily: theme.typography.body,
+            },
+          ]}
           placeholder="Nhập tên học viên"
           placeholderTextColor={theme.colors.textMuted}
         />
-        {errors.displayName ? <Text style={[styles.error, { color: theme.colors.danger }]}>{errors.displayName.message}</Text> : null}
+        {errors.displayName ? (
+          <Text style={[styles.error, { color: theme.colors.danger }]}>{errors.displayName.message}</Text>
+        ) : null}
 
-        <Text style={[styles.label, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>Mục tiêu học tập</Text>
+        <Text style={[styles.label, { color: theme.colors.heading, fontFamily: theme.typography.label }]}>
+          Mục tiêu học tập
+        </Text>
         <TextInput
           multiline
           numberOfLines={4}
           value={learningGoal}
           onChangeText={(value) => setValue('learningGoal', value)}
-          style={[styles.input, styles.textarea, { color: theme.colors.heading, borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceMuted, fontFamily: theme.typography.body }]}
+          style={[
+            styles.input,
+            styles.textarea,
+            {
+              color: theme.colors.heading,
+              borderColor: theme.colors.border,
+              backgroundColor: theme.colors.surfaceMuted,
+              fontFamily: theme.typography.body,
+            },
+          ]}
           placeholder="Ví dụ: đạt 80% đề tổng hợp trước ngày thi"
           placeholderTextColor={theme.colors.textMuted}
         />
-        {errors.learningGoal ? <Text style={[styles.error, { color: theme.colors.danger }]}>{errors.learningGoal.message}</Text> : null}
+        {errors.learningGoal ? (
+          <Text style={[styles.error, { color: theme.colors.danger }]}>{errors.learningGoal.message}</Text>
+        ) : null}
 
         <View style={styles.actions}>
           <Button label="Vào với Guest mode" onPress={startGuestMode} variant="secondary" />

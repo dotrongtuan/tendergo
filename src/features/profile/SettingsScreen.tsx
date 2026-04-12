@@ -66,8 +66,8 @@ export function SettingsScreen() {
         </Text>
         <Text style={[styles.helper, { color: theme.colors.textMuted, fontFamily: theme.typography.body }]}>
           Tùy chọn này sẽ làm sạch toàn bộ tiến độ học, bookmark, lịch sử thi, câu đã làm, tìm kiếm gần
-          đây và phiên thi đang dở. Nội dung chuyên đề, bài học và ngân hàng câu hỏi nghiệp vụ vẫn được giữ
-          nguyên.
+          đây và phiên thi đang dở. Sau khi reset, app sẽ quay lại luồng thiết lập học viên mới. Nội dung
+          chuyên đề, bài học và ngân hàng câu hỏi nghiệp vụ vẫn được giữ nguyên.
         </Text>
       </Card>
       <View style={styles.actions}>
@@ -76,7 +76,7 @@ export function SettingsScreen() {
           onPress={() =>
             Alert.alert(
               'Reset dữ liệu người học',
-              'Mọi tiến độ, bookmark, lịch sử thi và câu đã làm sẽ về trạng thái rỗng/zero. Dữ liệu chuyên đề không bị ảnh hưởng.',
+              'Mọi tiến độ, bookmark, lịch sử thi và câu đã làm sẽ về trạng thái rỗng/zero. Sau đó app sẽ quay lại bước thiết lập học viên mới. Dữ liệu chuyên đề không bị ảnh hưởng.',
               [
                 { text: 'Hủy' },
                 { text: 'Reset', style: 'destructive', onPress: resetLearnerProgress },

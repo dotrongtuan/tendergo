@@ -28,10 +28,11 @@ export function AppNavigator() {
   const navigationTheme = useNavigationTheme();
   const hasCompletedOnboarding = useAppStore((state) => state.preferences.hasCompletedOnboarding);
   const authMode = useAppStore((state) => state.preferences.authMode);
+  const flowKey = !hasCompletedOnboarding ? 'onboarding' : !authMode ? 'auth' : 'app';
 
   return (
     <NavigationContainer theme={navigationTheme}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator key={flowKey} screenOptions={{ headerShown: false }}>
         {!hasCompletedOnboarding ? (
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         ) : !authMode ? (

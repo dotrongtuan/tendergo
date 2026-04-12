@@ -13,10 +13,10 @@ import {
   seededRecentSearches,
 } from '../mock/seed';
 import type {
-  ExamReviewItem,
   AppSnapshot,
   DataTransferRecord,
   ExamResult,
+  ExamReviewItem,
   ExamSession,
   LearnerProfile,
   LessonProgress,
@@ -80,7 +80,7 @@ function buildInitialPersistedState() {
     lessonProgress: { ...mockLessonProgress },
     questionPerformance: { ...mockQuestionPerformance },
     history: [...mockHistory],
-    reviewMap: {},
+    reviewMap: {} as Record<string, ExamReviewItem[]>,
     activeSession: null as ExamSession | null,
     questionBankFilters: { ...DEFAULT_QUESTION_BANK_FILTERS },
     recentSearches: [...seededRecentSearches],
@@ -95,13 +95,17 @@ function buildFreshLearnerState(
   return {
     preferences: {
       ...preferences,
-      hasCompletedOnboarding: true,
-      authMode: preferences.authMode ?? 'guest',
+      hasCompletedOnboarding: false,
+      authMode: null,
     },
     profile: {
       ...profile,
+      displayName: '',
+      roleLabel: 'Chưa thiết lập',
+      learningGoal: '',
       streakDays: 0,
       joinedAt: new Date().toISOString(),
+      targetExamDate: undefined,
     },
     bookmarks: { lessonIds: [], questionIds: [] },
     lessonProgress: {} as Record<string, LessonProgress>,
@@ -126,14 +130,23 @@ export const useAppStore = create<AppStoreState>()(
       startGuestMode: () =>
         set((state) => ({
           preferences: { ...state.preferences, authMode: 'guest', hasCompletedOnboarding: true },
-          profile: { ...state.profile, roleLabel: 'Khách học thử' },
+          profile: {
+            ...state.profile,
+            displayName: state.profile.displayName.trim() || 'Khách học thử',
+            learningGoal: state.profile.learningGoal.trim() || mockProfile.learningGoal,
+            roleLabel: 'Khách học thử',
+          },
         })),
       startMockLogin: ({ displayName, learningGoal }) =>
         set((state) => ({
           preferences: { ...state.preferences, authMode: 'mock', hasCompletedOnboarding: true },
           profile: { ...state.profile, displayName, learningGoal, roleLabel: 'Học viên mô phỏng' },
         })),
-      signOut: () => set((state) => ({ preferences: { ...state.preferences, authMode: null }, activeSession: null })),
+      signOut: () =>
+        set((state) => ({
+          preferences: { ...state.preferences, authMode: null },
+          activeSession: null,
+        })),
       updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
       updateThemeMode: (mode) => set((state) => ({ preferences: { ...state.preferences, themeMode: mode } })),
       setRemindersEnabled: (value) =>
@@ -163,6 +176,7 @@ export const useAppStore = create<AppStoreState>()(
       markLessonVisited: (lessonId, minutesSpent = 4) =>
         set((state) => {
           const previous = state.lessonProgress[lessonId];
+
           return {
             lessonProgress: {
               ...state.lessonProgress,
@@ -178,6 +192,7 @@ export const useAppStore = create<AppStoreState>()(
       markLessonCompleted: (lessonId) =>
         set((state) => {
           const previous = state.lessonProgress[lessonId];
+
           return {
             lessonProgress: {
               ...state.lessonProgress,
@@ -198,11 +213,13 @@ export const useAppStore = create<AppStoreState>()(
         if (trimmed.length < 2) {
           return;
         }
+
         set((state) => ({ recentSearches: unique([trimmed, ...state.recentSearches]).slice(0, 8) }));
       },
       recordQuestionAttempt: (questionId, isCorrect) =>
         set((state) => {
           const previous = state.questionPerformance[questionId];
+
           return {
             questionPerformance: {
               ...state.questionPerformance,
@@ -285,6 +302,7 @@ export const useAppStore = create<AppStoreState>()(
       submitActiveSession: (result) =>
         set((state) => {
           const questionPerformance = { ...state.questionPerformance };
+
           result.reviewItems.forEach((item) => {
             const previous = questionPerformance[item.questionId];
             questionPerformance[item.questionId] = {
@@ -295,6 +313,7 @@ export const useAppStore = create<AppStoreState>()(
               lastAnsweredAt: result.historyEntry.completedAt,
             };
           });
+
           return {
             history: [result.historyEntry, ...state.history].slice(0, 30),
             reviewMap: { ...state.reviewMap, [result.historyEntry.id]: result.reviewItems },
@@ -305,6 +324,7 @@ export const useAppStore = create<AppStoreState>()(
       abandonActiveSession: () => set({ activeSession: null }),
       buildSnapshot: () => {
         const state = get();
+
         return {
           version: SNAPSHOT_VERSION,
           exportedAt: new Date().toISOString(),
@@ -324,7 +344,10 @@ export const useAppStore = create<AppStoreState>()(
             authMode: state.preferences.authMode ?? snapshot.preferences.authMode ?? 'guest',
           },
           profile: { ...snapshot.profile },
-          bookmarks: { lessonIds: [...snapshot.bookmarks.lessonIds], questionIds: [...snapshot.bookmarks.questionIds] },
+          bookmarks: {
+            lessonIds: [...snapshot.bookmarks.lessonIds],
+            questionIds: [...snapshot.bookmarks.questionIds],
+          },
           lessonProgress: { ...snapshot.lessonProgress },
           questionPerformance: { ...snapshot.questionPerformance },
           history: [...snapshot.history],
@@ -349,7 +372,11 @@ export const useAppStore = create<AppStoreState>()(
       resetToSeed: () =>
         set((state) => ({
           ...buildInitialPersistedState(),
-          preferences: { ...mockPreferences, hasCompletedOnboarding: true, authMode: state.preferences.authMode ?? 'guest' },
+          preferences: {
+            ...mockPreferences,
+            hasCompletedOnboarding: true,
+            authMode: state.preferences.authMode ?? 'guest',
+          },
         })),
     }),
     {
